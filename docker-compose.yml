@@ -3,12 +3,16 @@ services:
     build: .
     ports:
       - "5000:5000"
+    volumes:
+      - .:/app
+      - /app/node_modules 
+    command: npm run dev 
+
     environment:
       - NODE_ENV=${NODE_ENV}
       - PORT=5000
       - DATABASE_URL=${DATABASE_URL}
-      - REDIS_URL=redis://redis:6379
-      - REDIS_PASSWORD=${REDIS_PASSWORD}
+      - REDIS_URL=${REDIS_URL}
     depends_on:
       redis:
         condition: service_healthy
@@ -16,10 +20,15 @@ services:
 
   redis:
     image: redis:8.2.0
+    container_name: newsglance-redis
     restart: unless-stopped
     ports:
       - "6379:6379"
-    command: ["redis-server", "--appendonly", "yes", "--requirepass", "${REDIS_PASSWORD}"]
+    command: [
+      "redis-server",
+      "--requirepass", "${REDIS_PASSWORD}",
+      "--appendonly", "yes"
+    ]
     volumes:
       - redis_data:/data
     healthcheck:

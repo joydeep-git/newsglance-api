@@ -1,4 +1,11 @@
-FROM node:22-alpine
+FROM node:20.18.0-alpine
+
+RUN apk update && apk add --no-cache \
+  build-base \
+  python3 \
+  git \
+  bash \
+  && rm -rf /var/cache/apk/*
 
 WORKDIR /app
 

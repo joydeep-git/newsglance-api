@@ -22,9 +22,9 @@
     "docker:down": "docker compose down -v",
     "docker:logs": "docker compose logs -f | cat",
     "docker:dev": "docker compose up --build",
-    "prisma:generate": "prisma generate",
-    "prisma:migrate": "prisma migrate dev --name init",
-    "prisma:studio": "prisma studio"
+    "prisma:g": "prisma generate",
+    "prisma:m": "prisma migrate dev --name init",
+    "prisma:s": "prisma studio"
   },
   "devDependencies": {
     "@prisma/client": "^6.16.1",
