@@ -1,8 +1,9 @@
 services:
   app:
+    container_name: newsglance-api-dev
     build: .
     ports:
-      - "5000:5000"
+      - "5005:5000"
     volumes:
       - .:/app
       - /app/node_modules 
@@ -10,7 +11,7 @@ services:
 
     environment:
       - NODE_ENV=${NODE_ENV}
-      - PORT=5000
+      - PORT=${PORT}
       - DATABASE_URL=${DATABASE_URL}
       - REDIS_URL=${REDIS_URL}
     depends_on:
@@ -19,11 +20,11 @@ services:
     restart: unless-stopped
 
   redis:
-    image: redis:8.2.0
+    image: redis:7.2-alpine
     container_name: newsglance-redis
     restart: unless-stopped
     ports:
-      - "6379:6379"
+      - "56789:6379"
     command: [
       "redis-server",
       "--requirepass", "${REDIS_PASSWORD}",

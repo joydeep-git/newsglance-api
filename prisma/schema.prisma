@@ -1,0 +1,84 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id       String @id @default(cuid())
+  name     String
+  username String @unique
+  email    String @unique
+  password String
+
+  isPremium      Boolean   @default(false)
+  planExpiryDate DateTime?
+  newsBalance    Int       @default(2)
+  audioBalance   Int       @default(2)
+
+  defaultCountry   String         @default("IN")
+
+  comments         Comment[]
+  payments         Payment[]
+  avatarId         String?
+  avatar           File?          @relation("UserAvatar", fields: [avatarId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model File {
+  id          String     @id @default(cuid())
+  name        String
+  url         String
+  fileSize    Float
+  type        FileType
+  createdAt   DateTime   @default(now())
+  newsAudio   NewsData[] @relation("AudioFile")
+  usersAvatar User[]     @relation("UserAvatar")
+}
+
+model Payment {
+  id        String        @id @default(cuid())
+  stripeId  String?       @unique
+  userId    String
+  amount    Float
+  currency  String        @default("INR")
+  status    PaymentStatus
+  provider  String        @default("stripe")
+  createdAt DateTime      @default(now())
+  user      User          @relation(fields: [userId], references: [id])
+}
+
+model NewsData {
+  id            String    @id @default(cuid())
+  guardianId    String
+  summarization String?
+  audioFileId   String?
+  comments      Comment[]
+  audioFile     File?     @relation("AudioFile", fields: [audioFileId], references: [id])
+}
+
+model Comment {
+  id        String   @id @default(cuid())
+  content   String
+  userId    String
+  newsId    String
+  createdAt DateTime @default(now())
+  news      NewsData @relation(fields: [newsId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
+}
+
+enum FileType {
+  image
+  audio
+}
+
+enum PaymentStatus {
+  success
+  failed
+  pending
+}
