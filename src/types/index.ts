@@ -29,11 +29,23 @@ export type EmailSendResponse = {
 
 
 
-export type TokenCreateResponseType = [ string, string,
-  {
-    httpOnly: boolean;
-    secure: boolean;
-    maxAge: number;
-    sameSite: "lax" | "none"
-  }
-]
+export type TokenCreateResponseType = {
+  httpOnly: boolean;
+  secure: boolean;
+  maxAge: number;
+  sameSite: "lax" | "none"
+}
+
+
+
+export interface GeolocationData {
+  ip: string;
+  city: string;
+  region: string;
+  country: string;
+  loc: string;
+  org: string;
+  postal: string;
+  timezone: string;
+}
+

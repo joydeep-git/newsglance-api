@@ -5,7 +5,7 @@ export type UserDataType = {
   name: string;
   username: string;
   email: string;
-  password: string;
+  password?: string;
   avatarId: string | null;
   newsBalance: number;
   audioBalance: number;
@@ -15,5 +15,6 @@ export type UserDataType = {
   createdAt: Date;
   updatedAt: Date;
 }
+
 
 export type OtpType = "register" | "login" | "forget-password" | "delete-account";

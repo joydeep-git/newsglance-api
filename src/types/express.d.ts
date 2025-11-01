@@ -1,5 +1,5 @@
+import { UserDataType } from "./auth-types";
 
-import UserDataType from "./index";
 
 declare global {
 
@@ -8,6 +8,8 @@ declare global {
     interface Request {
 
       user: UserDataType;
+
+      token: string;
 
     }
 

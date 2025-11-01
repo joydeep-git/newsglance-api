@@ -3,24 +3,31 @@ import db from "./db-client"
 import { UserDataType } from '../types/auth-types';
 import { Request } from 'express';
 import { errRouter } from '../error-handlers/error-responder';
+import locationService from "../location/locationService";
 
 
 const authQueries = {
 
 
-  async findUser({ value, type = "email" }: { value: string; type: "email" | "username" | "id"; }): Promise<UserDataType | null> {
+  async findUser({ value, type = "email", getPassword = false }: {
+    value: string;
+    type: "email" | "username" | "id";
+    getPassword?: boolean;
+  }): Promise<UserDataType | null> {
 
     try {
-      
-      let user: UserDataType | null = null;
 
-      user = await db.user.findFirst({
+      return await db.user.findFirst({
         where: {
           [type]: value,
         },
+        omit: {
+          password: !getPassword
+        },
+        include: {
+          avatar: true,
+        }
       })
-
-      return user;
 
     } catch (err) {
       throw errRouter(err);
@@ -28,7 +35,7 @@ const authQueries = {
   },
 
 
-  async createNewUser(req: Request): Promise<UserDataType> {
+  async createNewUser({ req, getPassword = false }: { req: Request; getPassword?: boolean; }): Promise<UserDataType> {
 
     try {
 
@@ -36,16 +43,27 @@ const authQueries = {
 
       const hashedPassword = await argon2.hash(password);
 
-      const newUser = await db.user.create({
+      let country: string | null = null;
+
+      if (req.ip) {
+        country = await locationService.getLocation(req.ip!)
+      }
+
+      return await db.user.create({
         data: {
           name,
           username,
           email,
-          password: hashedPassword
+          password: hashedPassword,
+          defaultCountry: country ?? "IN",
+        },
+        omit: {
+          password: !getPassword
+        },
+        include: {
+          avatar: true,
         }
       });
-
-      return newUser;
 
     } catch (err) {
       throw errRouter(err);
@@ -54,8 +72,12 @@ const authQueries = {
   },
 
 
-
-  async updateSingleValue({ userId, field, value }: { field: keyof UserDataType; value: string; userId: string; }) {
+  async updateSingleValue({ identifier, field, value, getPassword = false }: {
+    field: keyof UserDataType;
+    value: string;
+    identifier: string;
+    getPassword?: boolean;
+  }) {
 
     try {
 
@@ -65,10 +87,13 @@ const authQueries = {
 
       return await db.user.update({
         where: {
-          id: userId,
+          email: identifier
         },
         data: {
           [field]: value
+        },
+        omit: {
+          password: !getPassword
         }
       })
 
@@ -76,6 +101,19 @@ const authQueries = {
       throw errRouter(err);
     }
 
+  },
+
+
+  async deleteUser({ id, email }: { id: string; email: string; }): Promise<UserDataType | null> {
+
+    return db.user.delete({
+      where: {
+        id, email
+      },
+      omit: {
+        password: true
+      }
+    });
   }
 
 }

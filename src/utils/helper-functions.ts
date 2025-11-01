@@ -1,3 +1,4 @@
+import crypto from "crypto";
 import { Request } from "express";
 
 
@@ -47,6 +48,7 @@ export const otpGenerator = (): string => {
   const charsLength: number = chars.length;
 
   const array: Uint32Array = new Uint32Array(length);
+
   crypto.getRandomValues(array);
 
   let otp: string = "";
@@ -58,3 +60,31 @@ export const otpGenerator = (): string => {
   return otp;
 
 };
+
+
+
+export const randomUsernameGenerator = (name?: string) => {
+
+  const baseName: string = name?.trim().toLowerCase() ?? "User_";
+
+  const randomHex = crypto.randomBytes(6).toString('hex');
+
+  return baseName + randomHex;
+}
+
+
+export const randomPasswordGenerator = (length = 12) => {
+
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+-=[]{}|;:,.<>?';
+
+  let password = '';
+
+  const randomBytes = crypto.randomBytes(length);
+
+  for (let i = 0; i < length; i++) {
+    const index = randomBytes[i] % chars.length;
+    password += chars[index];
+  }
+
+  return password;
+}
