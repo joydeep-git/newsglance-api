@@ -1,16 +1,11 @@
-import {OtpType, UserDataType} from './../types/auth-types';
-import argon2 from 'argon2';
 import { NextFunction, Request, Response } from "express";
 import { StatusCode } from "../types";
 import { errRes, errRouter } from "../error-handlers/error-responder";
-import ErrorHandler from "../error-handlers/error-handler";
 import db from "../prisma-utils/db-client";
-import { fieldValidator, isValidEmail, otpGenerator } from '../utils/helper-functions';
+import { isValidEmail, otpGenerator } from '../utils/helper-functions';
 import authQueries from '../prisma-utils/auth-queries';
 import emailVerificationService from '../email-service/email-service';
 import authRedis from '../redis-service/auth-redis';
-import jwt, {JwtPayload} from "jsonwebtoken";
-import authToken from "../middleware/auth-token";
 
 
 class UtilityControllers {
@@ -27,7 +22,7 @@ class UtilityControllers {
 
       if ( type === "" || !type || type.length <= 0 ) return next(errRes("Type can not be empty!", StatusCode.BAD_REQUEST));
 
-      const user = await authQueries.findUser({ value: email, type: "email", getPassword: false });
+      const user = await authQueries.findUser({ value: email, type: "email", getPassword: true });
 
       // checking what kind of response is it
       switch (type) {
@@ -56,7 +51,9 @@ class UtilityControllers {
 
         await authRedis.setOtp({ email, otp, type });
 
-        return res.status(StatusCode.OK).json({
+        if (user) await authRedis.setUserData(user);
+
+        res.status(StatusCode.OK).json({
           message: "Check your mail box for OTP!"
         })
 

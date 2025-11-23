@@ -39,7 +39,7 @@ const authQueries = {
 
     try {
 
-      const { username, email, name, password } = await req.body;
+      const { username, email, name, password } = req.body;
 
       const hashedPassword = await argon2.hash(password);
 

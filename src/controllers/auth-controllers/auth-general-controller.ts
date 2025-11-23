@@ -34,7 +34,7 @@ class AuthGeneralControllers {
 
     try {
 
-      const { email, password, otp } = await req.body;
+      const { email, password, otp } = req.body;
 
       if (!isValidEmail(email)) return next(errRes("Invalid Email!", StatusCode.BAD_REQUEST));
 

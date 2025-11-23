@@ -17,7 +17,7 @@ class AuthCredentialControllers {
 
     try {
 
-      const { username, email, otp } = await req.body;
+      const { username, email, otp } = req.body;
 
 
       // check missing fields
@@ -71,7 +71,7 @@ class AuthCredentialControllers {
 
     try {
 
-      const { email, password, otp } = await req.body;
+      const { email, password, otp } = req.body;
 
       // check missing fields
       const missingField = fieldValidator(["email", "password", "otp"], req);
@@ -86,7 +86,9 @@ class AuthCredentialControllers {
         return next(errRes("Incorrect OTP!", StatusCode.UNAUTHORIZED));
       }
 
-      const user = await authQueries.findUser({ type: "email", value: email, getPassword: true });
+      let user: UserDataType | null = await authRedis.getUserData(email);
+
+      if (!user) user = await authQueries.findUser({ type: "email", value: email, getPassword: true });
 
       if (!user) return next(errRes("No Account Found!", StatusCode.BAD_REQUEST));
 
@@ -126,22 +128,21 @@ class AuthCredentialControllers {
 
 
   // forget password + delete OTP
-  public async forgetPassword(req: Request, res: Response, next: NextFunction) {
+  public async forgetPasswordUpdate(req: Request, res: Response, next: NextFunction) {
 
     try {
 
-      const { email, otp, password } = await req.body;
+      const { email, otp, password } = req.body;
 
       if (!isValidEmail(email)) return next(errRes("Invalid Email!", StatusCode.BAD_REQUEST));
 
-      const user = await authQueries.findUser({ type: "email", value: email });
+      const verified = await authRedis.checkPasswordReset({ email, otp });
 
-      // if no user
-      if (!user) return next(errRes("No User found!", StatusCode.BAD_REQUEST));
+      if (!verified) return next(errRes("OTP unverified or expired!", StatusCode.BAD_REQUEST));
 
-      const isVerified = await authRedis.verifyOtp({ email, otp, type: "forget-password" });
+      let user: UserDataType | null = await authRedis.getUserData(email);
 
-      if (!isVerified) return next(errRes("Incorrect OTP", StatusCode.UNAUTHORIZED));
+      if (!user) user = await authQueries.findUser({ type: "email", value: email, getPassword: false });
 
       const update = await authQueries.updateSingleValue({ identifier: email, field: "password", value: password });
 
@@ -149,16 +150,43 @@ class AuthCredentialControllers {
 
         await authRedis.deleteOtp({ email, type: "forget-password" });
 
+        await authRedis.deletePasswordReset({ email, otp });
+
         return res.status(StatusCode.OK).json({
           message: "Password Changed!"
         })
 
       } else {
-        return next(errRes("Unable to change password!", StatusCode.INTERNAL_SERVER_ERROR));
+
+        return next(errRes("Failed to update password!", StatusCode.INTERNAL_SERVER_ERROR));
+
       }
 
     } catch (err) {
       return next(errRouter(err));
+    }
+
+  }
+
+
+  public async forgetPasswordVerification(req: Request, res: Response, next: NextFunction) {
+
+    try {
+
+      const { email, otp } = req.body;
+
+      const verified = await authRedis.verifyOtp({ email, otp, type: "forget-password" });
+
+      if (!verified) return next(errRes("Incorrect or expired OTP", StatusCode.UNAUTHORIZED));
+
+      await authRedis.setPasswordReset({ email, otp });
+
+      return res.status(StatusCode.OK).json({ success: true, message: "OTP verified" });
+
+    } catch (err) {
+
+      return next(errRouter(err));
+
     }
 
   }
