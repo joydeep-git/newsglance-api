@@ -29,10 +29,34 @@ class AuthRedis extends RedisService {
   }
 
 
+  public async setPasswordReset({ email, otp }: { email: string; otp: string; }): Promise<void> {
+
+    const validOtp: boolean = await this.verifyOtp({ email, otp, type: "forget-password" });
+
+    if (validOtp) {
+      this.redis.setex(`auth:verified:${email + otp}`, 600, "true");
+    }
+  }
+
+
+  public async checkPasswordReset({ email, otp }: { email: string; otp: string; }) {
+
+    const valid: boolean | null = Boolean(await this.redis.get(`auth:verified:${email + otp}`));
+
+    return valid ?? false;
+
+  }
+
+
+  public async deletePasswordReset({ email, otp }: { email: string; otp: string; }) {
+    await this.redis.del(`auth:verified:${email + otp}`);
+  }
+
 
   public async setBlacklistedToken(token: string): Promise<void> {
     await this.redis.setex(`auth:token:blacklist:${token}`, 259200, token);
   }
+
 
   public async getBlacklistedToken(token: string): Promise<boolean> {
     return (await this.redis.get(`auth:token:blacklist:${token}`)) ? true : false;
@@ -41,13 +65,13 @@ class AuthRedis extends RedisService {
 
 
   public async setUserData(userData: UserDataType): Promise<void> {
-    await this.redis.setex(`auth:user:${userData?.id}`, 600, JSON.stringify(userData));
+    await this.redis.setex(`auth:user:${userData?.email}`, 600, JSON.stringify(userData));
   }
 
 
-  public async getUserData(userId: string): Promise<UserDataType | null> {
+  public async getUserData(userEmail: string): Promise<UserDataType | null> {
 
-    const data = await this.redis.get(`auth:user:${userId}`);
+    const data = await this.redis.get(`auth:user:${userEmail}`);
 
     if (data) return JSON.parse(data);
 
@@ -55,9 +79,10 @@ class AuthRedis extends RedisService {
   }
 
 
-  public async deleteUserData(userId: string): Promise<void> {
-    await this.redis.del(`auth:user:${userId}`);
+  public async deleteUserData(userEmail: string): Promise<void> {
+    await this.redis.del(`auth:user:${userEmail}`);
   }
+
 
 }
 

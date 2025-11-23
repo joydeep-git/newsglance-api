@@ -28,7 +28,9 @@ class AuthRouters {
 
     this.router.post("/cr/login", authControllers.login);
 
-    this.router.post("/cr/forget-password", authControllers.forgetPassword);
+    this.router.post("/cr/forget/verify", authControllers.forgetPasswordVerification);
+
+    this.router.post("/cr/forget/update", authControllers.forgetPasswordUpdate);
 
   }
 
