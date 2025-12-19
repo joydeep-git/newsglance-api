@@ -18,6 +18,11 @@ import { responseWrapper } from "./middleware/response-wrapper";
 import "./redis-service/redis-service";
 
 
+// AWS services
+import "./aws-service/s3";
+
+
+
 class Server {
 
   private app: Application;

@@ -1,3 +1,4 @@
+import { ImageFileType } from ".";
 
 
 export type UserDataType = {
@@ -7,6 +8,7 @@ export type UserDataType = {
   email: string;
   password?: string;
   avatarId: string | null;
+  avatar?: ImageFileType | null;
   newsBalance: number;
   audioBalance: number;
   isPremium: boolean;
@@ -15,6 +17,7 @@ export type UserDataType = {
   createdAt: Date;
   updatedAt: Date;
 }
+
 
 
 export type OtpType = "register" | "login" | "forget-password" | "delete-account";

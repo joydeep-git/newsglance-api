@@ -49,3 +49,22 @@ export interface GeolocationData {
   timezone: string;
 }
 
+
+
+export interface FileDataType {
+  id: string;
+  name: string;
+  url: string;
+  fileSize: number;
+  createdAt: string;
+};
+
+
+
+export type ImageFileType = FileDataType & {
+  type: "image";
+} 
+
+export type AudioFileType = FileDataType & {
+  type: "audio";
+}

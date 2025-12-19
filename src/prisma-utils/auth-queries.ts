@@ -24,9 +24,9 @@ const authQueries = {
         omit: {
           password: !getPassword
         },
-        include: {
-          avatar: true,
-        }
+        // include: {
+        //   avatar: true,
+        // }
       })
 
     } catch (err) {
@@ -59,9 +59,6 @@ const authQueries = {
         },
         omit: {
           password: !getPassword
-        },
-        include: {
-          avatar: true,
         }
       });
 
