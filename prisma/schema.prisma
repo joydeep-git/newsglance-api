@@ -19,57 +19,78 @@ model User {
   newsBalance    Int       @default(2)
   audioBalance   Int       @default(2)
 
-  defaultCountry   String         @default("IN")
+  defaultCountry String @default("IN")
 
-  comments         Comment[]
-  payments         Payment[]
-  avatarId         String?
-  avatar           File?          @relation("UserAvatar", fields: [avatarId], references: [id])
+  comments Comment[]
+  payments Payment[]
+
+  avatarId String @default("cmjzooxly00003hnzan79m85n")
+  avatar   File   @relation("avatar", fields: [avatarId], references: [id], onDelete: SetDefault)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@index([avatarId])
 }
 
 model File {
-  id          String     @id @default(cuid())
-  name        String
-  url         String
-  fileSize    Float
-  type        FileType
-  createdAt   DateTime   @default(now())
+  id       String   @id @default(cuid())
+  name     String
+  url      String   @unique
+  fileSize Float
+  type     FileType
+
+  isDefaultFile Boolean @default(false)
+
+  createdAt DateTime @default(now())
+
+  // Relations
   newsAudio   NewsData[] @relation("AudioFile")
-  usersAvatar User[]     @relation("UserAvatar")
+  usersAvatar User[]     @relation("avatar")
 }
 
 model Payment {
-  id        String        @id @default(cuid())
-  stripeId  String?       @unique
-  userId    String
-  amount    Float
-  currency  String        @default("INR")
-  status    PaymentStatus
-  provider  String        @default("stripe")
-  createdAt DateTime      @default(now())
-  user      User          @relation(fields: [userId], references: [id])
+  id       String        @id @default(cuid())
+  stripeId String?       @unique
+  userId   String
+  amount   Float
+  currency String        @default("INR")
+  status   PaymentStatus
+  provider String        @default("dodopay")
+
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
 }
 
 model NewsData {
-  id            String    @id @default(cuid())
-  guardianId    String
+  id            String  @id @default(cuid())
+  guardianId    String  @unique
   summarization String?
-  audioFileId   String?
-  comments      Comment[]
-  audioFile     File?     @relation("AudioFile", fields: [audioFileId], references: [id])
+
+  audioFileId String?
+  audioFile   File?   @relation("AudioFile", fields: [audioFileId], references: [id], onDelete: SetNull)
+
+  comments Comment[]
+
+  @@index([audioFileId])
 }
 
 model Comment {
-  id        String   @id @default(cuid())
-  content   String
-  userId    String
-  newsId    String
+  id      String @id @default(cuid())
+  content String
+  userId  String
+  newsId  String
+
   createdAt DateTime @default(now())
-  news      NewsData @relation(fields: [newsId], references: [id])
-  user      User     @relation(fields: [userId], references: [id])
+
+  news NewsData @relation(fields: [newsId], references: [id], onDelete: Cascade)
+  user User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([newsId])
 }
 
 enum FileType {

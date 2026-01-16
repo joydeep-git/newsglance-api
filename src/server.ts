@@ -15,11 +15,10 @@ import newsRouters from "./routers/news-routers";
 import utilityRouters from "./routers/utility-routers";
 import { responseWrapper } from "./middleware/response-wrapper";
 
-import "./redis-service/redis-service";
-
+import redisService from "./redis-service/redis-service";
 
 // AWS services
-import "./aws-service/s3";
+import cloudStorage from "./aws-service/s3";
 
 
 
@@ -36,6 +35,10 @@ class Server {
     this.app = express();
 
     this.port = Number(process.env.PORT);
+
+    void redisService;
+
+    void cloudStorage;
 
     this.runServer();
 
