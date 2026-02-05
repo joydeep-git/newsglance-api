@@ -1,5 +1,5 @@
 import express, { Router } from "express";
-import utilityControllers from "../controllers/utility-controllers";
+import utilityControllers from "@/controllers/utility-controllers";
 
 
 class UtilityRouters {
@@ -15,6 +15,8 @@ class UtilityRouters {
     this.router.post("/generate-otp", utilityControllers.generateOtp);
 
     this.router.get("/reset-limit", utilityControllers.resetLimit);
+
+    this.router.get("/upload-default-image", utilityControllers.uploadDefaultImage);
 
   }
 
