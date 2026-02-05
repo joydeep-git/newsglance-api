@@ -1,7 +1,7 @@
-import { errRes, errRouter } from "../error-handlers/error-responder"
-import { ImageFileType, StatusCode } from "../types";
-import { UserDataType } from "../types/auth-types";
-import db from "./db-client";
+import { errRouter } from "@/error-handlers/error-responder";
+import { UserDataType } from "@/types/auth-types";
+import { defaultAvatarId } from "@/utils/constants";
+import db from "@/prisma-utils/db-client";
 
 
 
@@ -12,13 +12,17 @@ const userQueries = {
 
     try {
 
-      return await db.user.update({
+      const res: UserDataType = await db.user.update({
         where: { id },
         data,
-        // include: {
-        //   avatar: true,
-        // }
-      })
+        include: {
+          avatar: true,
+        },
+      });
+
+      if (res?.password) delete res.password;
+
+      return res;
 
     } catch (err) {
       throw errRouter(err);
@@ -27,31 +31,49 @@ const userQueries = {
   },
 
 
-  async updateAvatar({ id, imageData }: { id: string; imageData: ImageFileType; }): Promise<UserDataType> {
+  async updateAvatar({ userId, imageId }: { userId: string; imageId: string; }): Promise<UserDataType> {
 
     try {
 
-      await db.file.create({
+      const data: UserDataType = await db.user.update({
+        where: { id: userId },
         data: {
-          ...imageData,
-          type: "image"
+          avatarId: imageId,
+        },
+      });
+
+      if (data.password) delete data.password;
+
+      return data;
+
+    } catch (err) {
+      throw errRouter(err);
+    }
+
+  },
+
+
+  async deleteAvatar({ id }: { id: string; }): Promise<UserDataType> {
+
+    try {
+
+      const data: UserDataType = await db.user.update({
+        where: { id },
+        data: {
+          avatarId: defaultAvatarId,
         }
       });
 
-      const user = await db.user.update({
-        where: { id },
-        data: {
-          avatarId: imageData.id,
-        }
-      })
+      if (data?.password) delete data.password;
 
-      return user;
+      return data;
 
     } catch (err) {
       throw errRouter(err);
     }
 
   }
+
 
 }
 

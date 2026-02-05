@@ -1,9 +1,9 @@
 import argon2 from 'argon2';
-import db from "./db-client"
-import { UserDataType } from '../types/auth-types';
+import db from "@/prisma-utils/db-client"
+import { UserDataType } from '@/types/auth-types';
 import { Request } from 'express';
-import { errRouter } from '../error-handlers/error-responder';
-import locationService from "../location/locationService";
+import { errRouter } from '@/error-handlers/error-responder';
+import locationService from "@/services/location/locationService";
 
 
 const authQueries = {
@@ -13,7 +13,7 @@ const authQueries = {
     value: string;
     type: "email" | "username" | "id";
     getPassword?: boolean;
-  }): Promise<UserDataType | null> {
+  }): Promise<UserDataType | null > {
 
     try {
 
@@ -24,10 +24,10 @@ const authQueries = {
         omit: {
           password: !getPassword
         },
-        // include: {
-        //   avatar: true,
-        // }
-      })
+        include: {
+          avatar: true,
+        }
+      });
 
     } catch (err) {
       throw errRouter(err);
@@ -59,6 +59,9 @@ const authQueries = {
         },
         omit: {
           password: !getPassword
+        },
+        include: {
+          avatar: true
         }
       });
 
@@ -103,14 +106,22 @@ const authQueries = {
 
   async deleteUser({ id, email }: { id: string; email: string; }): Promise<UserDataType | null> {
 
-    return db.user.delete({
-      where: {
-        id, email
-      },
-      omit: {
-        password: true
-      }
-    });
+    try {
+
+      return await db.user.delete({
+        where: {
+          id, email
+        },
+        omit: {
+          password: true
+        },
+      });
+
+    } catch (err) {
+      throw errRouter(err);
+    }
+
+
   }
 
 }
