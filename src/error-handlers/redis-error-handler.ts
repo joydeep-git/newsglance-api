@@ -1,50 +1,36 @@
-import ErrorHandler from "./error-handler";
-import { StatusCode } from "../types";
+// src/error-handlers/redis-error-handler.ts
+import ErrorHandler from "@/error-handlers/error-handler";
+import { StatusCode } from "@/types";
+import { errorPrinter } from "@/error-handlers/error-responder";
 
-const redisErrorHandler = (err: unknown): ErrorHandler => {
+const redisErrorHandler = (err: any): ErrorHandler => {
 
-  let status: number = StatusCode.INTERNAL_SERVER_ERROR;
 
-  let message: string = "Redis Error";
+  errorPrinter("REDIS ERROR", err);
 
-  if (typeof err === "object" && err !== null) {
 
-    const error = err as Error;
+  const message = err.message || "";
 
-    if (error.message.includes("ECONNREFUSED")) {
 
-      message = "Redis connection refused";
-
-    } else if (error.message.includes("WRONGTYPE")) {
-
-      message = "Redis type mismatch error";
-
-    } else if (error.message.includes("NOAUTH")) {
-
-      message = "Redis authentication error";
-
-      status = StatusCode.UNAUTHORIZED;
-
-    } else if (error.message.includes("READONLY")) {
-
-      message = "Redis is in read-only mode";
-
-    } else if (error.message.includes("Timeout")) {
-
-      message = "Redis timeout error";
-
-    } else if (error.message.includes("CONNECTION")) {
-
-      message = "Redis connection error";
-
-    } else if (error?.message) {
-
-      message = error.message;
-
-    }
+  if (message.includes("MOVED") || message.includes("CLUSTERDOWN")) {
+    return new ErrorHandler({
+      message: "Cache service is currently rebalancing. Please try again.",
+      status: StatusCode.SERVICE_UNAVAILABLE
+    });
   }
 
-  return new ErrorHandler({ status, message });
+  if (message.includes("NOAUTH")) {
+    return new ErrorHandler({
+      message: "Cache authentication failed internally.",
+      status: StatusCode.INTERNAL_SERVER_ERROR
+    });
+  }
+
+
+  return new ErrorHandler({
+    message: "Cache service unavailable.",
+    status: StatusCode.INTERNAL_SERVER_ERROR
+  });
 };
 
 export default redisErrorHandler;

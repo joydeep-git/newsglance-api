@@ -1,7 +1,7 @@
 
 import { NextFunction, Request, Response } from "express";
-import { StatusCode } from "../types";
-import ErrorHandler from "./error-handler";
+import { StatusCode } from "@/types";
+import ErrorHandler from "@/error-handlers/error-handler";
 
 
 const errorMiddleware = (
