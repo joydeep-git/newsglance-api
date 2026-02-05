@@ -1,24 +1,33 @@
-FROM node:22-alpine
+
+FROM node:20.13.1-alpine AS builder
 
 WORKDIR /app
 
-# Copy package files
 COPY package*.json ./
+RUN npm ci --no-cache
 
-# Install dependencies
-RUN npm ci
-
-# Copy source code
 COPY . .
-
-# Generate Prisma client
 RUN npx prisma generate
-
-# Build TypeScript (matches your "build" script)
 RUN npm run build
 
-# Expose port
+FROM node:20.13.1-alpine
+
+WORKDIR /app
+
+COPY --from=builder /app/package*.json ./
+COPY --from=builder /app/node_modules ./node_modules
+
+COPY --from=builder /app/dist ./dist
+
+
+
+RUN addgroup --system app && adduser --system --ingroup app app
+USER app
+
+
+
+ENV HOST=0.0.0.0
 EXPOSE 5000
 
-# Start command (matches your "start" script)
-CMD ["npm", "start"]
+
+CMD ["node", "dist/server.js"]
