@@ -6,19 +6,19 @@ import cookieParser from "cookie-parser";
 import rateLimit from "express-rate-limit";
 import cors from "cors";
 
-import errorMiddleware from "./error-handlers/error-middleware";
-import routeErrorHandler from "./middleware/route-error-handler";
+import errorMiddleware from "@/error-handlers/error-middleware";
+import routeErrorHandler from "@/middleware/route-error-handler";
 
-import authRouters from "./routers/auth-router";
-import userRouters from "./routers/user-routers";
-import newsRouters from "./routers/news-routers";
-import utilityRouters from "./routers/utility-routers";
-import { responseWrapper } from "./middleware/response-wrapper";
+import authRouters from "@/routers/auth-router";
+import userRouters from "@/routers/user-routers";
+import newsRouters from "@/routers/news-routers";
+import utilityRouters from "@/routers/utility-routers";
+import { responseWrapper } from "@/middleware/response-wrapper";
 
-import redisService from "./redis-service/redis-service";
+import redisService from "@/services/redis-service/redis-service";
 
 // AWS services
-import cloudStorage from "./aws-service/s3";
+import cloudStorage from "@/services/aws-service/s3";
 
 
 
@@ -75,12 +75,12 @@ class Server {
     this.app.use(helmet());
 
     this.app.use(
-        cors({
+      cors({
         origin: process.env.FRONTEND_URL,
         methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
         credentials: true,
         optionsSuccessStatus: 204
-    })
+      })
     )
 
     this.app.use(rateLimit({
