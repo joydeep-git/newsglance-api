@@ -1,5 +1,5 @@
 import axios from "axios";
-import { GeolocationData } from "../types";
+import { GeolocationData } from "@/types";
 
 class LocationService {
 

@@ -1,11 +1,11 @@
 import nodemailer, { Transporter } from "nodemailer";
-import { EmailSendResponse } from "../types";
-import { OtpType } from "../types/auth-types";
-import registationOtpTemplate from "../templates/register-otp-template";
-import generalOtpTemplate from "../templates/general-otp-template";
-import loginOtpTemplate from "../templates/login-otp-template";
-import deleteAccOtpTemplate from "../templates/delete-acc-otp-template";
-import forgetPassOtpTemplate from "../templates/forget-password-otp-template";
+import { EmailSendResponse } from "@/types";
+import { OtpType } from "@/types/auth-types";
+import registationOtpTemplate from "@/templates/register-otp-template";
+import generalOtpTemplate from "@/templates/general-otp-template";
+import loginOtpTemplate from "@/templates/login-otp-template";
+import deleteAccOtpTemplate from "@/templates/delete-acc-otp-template";
+import forgetPassOtpTemplate from "@/templates/forget-password-otp-template";
 
 
 class EmailVerificationService {

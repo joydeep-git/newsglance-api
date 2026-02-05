@@ -3,7 +3,7 @@ import Redis from "ioredis";
 
 class RedisService {
 
-  protected redis: Redis;
+  public redis: Redis;
 
   private redisUrl: string;
 
@@ -23,4 +23,6 @@ class RedisService {
 
 }
 
-export default RedisService;
+const redisService = new RedisService();
+
+export default redisService;

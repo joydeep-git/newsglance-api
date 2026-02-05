@@ -1,7 +1,10 @@
-import { OtpType, UserDataType } from "../types/auth-types";
-import RedisService from "./redis-service";
+import Redis from "ioredis";
+import { OtpType, UserDataType } from "@/types/auth-types";
+import redisService from "@/services/redis-service/redis-service";
 
-class AuthRedis extends RedisService {
+class AuthRedis {
+
+  private redis: Redis = redisService.redis;
 
 
   public async setOtp({ email, otp, type }: { email: string; otp: string; type: OtpType; }) {
