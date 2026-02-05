@@ -1,10 +1,12 @@
 import { NextFunction, Request, Response } from "express";
-import { StatusCode } from "../../types";
-import authRedis from "../../redis-service/auth-redis";
-import { errRes, errRouter } from "../../error-handlers/error-responder";
-import { isValidEmail } from "../../utils/helper-functions";
+import { StatusCode } from "@/types/index";
+import { errRes, errRouter } from "@/error-handlers/error-responder";
+import { isValidEmail } from "@/utils/helper-functions";
 import * as argon2 from "argon2";
-import authQueries from "../../prisma-utils/auth-queries";
+import authQueries from "@/prisma-utils/auth-queries";
+import cloudStorage from "@/services/aws-service/s3";
+import filesQueries from "@/prisma-utils/files-queries";
+import authRedis from "@/services/redis-service/auth-redis";
 
 
 class AuthGeneralControllers {
@@ -47,21 +49,31 @@ class AuthGeneralControllers {
       if (!isValidOtp) return next(errRes("Incorrect OTP!", StatusCode.BAD_REQUEST));
 
 
-      const response = await authQueries.deleteUser({ id: req.user.id, email });
+      // delete account details
 
-      if (response) {
+      const deletedAccount = await authQueries.deleteUser({ id: req.user.id, email });
+
+      if (!deletedAccount) {
+
+        return next(errRes("Unable to delete account!", StatusCode.INTERNAL_SERVER_ERROR));
+
+      } else {
 
         res.clearCookie("token").status(StatusCode.OK).json({
           message: "Account Deleted!"
         });
 
-        await authRedis.deleteUserData(req.user.id);
+        try {
+          await cloudStorage.deleteFile(req.user.avatar?.url!);
 
-        await authRedis.deleteOtp({ email, type: "delete-account" });
+          await authRedis.deleteUserData(req.user.id);
 
-      } else {
+          await filesQueries.deleteFileRow({ type: "id", value: req.user.avatarId });
+        } catch {
 
-        return next(errRes("Unable to delete account!", StatusCode.INTERNAL_SERVER_ERROR));
+          null; // stopping sending any error
+
+        }
 
       }
 

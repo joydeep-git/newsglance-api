@@ -1,12 +1,12 @@
 import argon2 from "argon2";
 import { NextFunction, Request, Response } from "express";
-import { errRes, errRouter } from "../../error-handlers/error-responder";
-import authToken from "../../middleware/auth-token";
-import authQueries from "../../prisma-utils/auth-queries";
-import authRedis from "../../redis-service/auth-redis";
-import { StatusCode } from '../../types';
-import { UserDataType } from "../../types/auth-types";
-import { fieldValidator, isValidEmail } from "../../utils/helper-functions";
+import { errRes, errRouter } from "@/error-handlers/error-responder";
+import authToken from "@/middleware/auth-token";
+import authQueries from "@/prisma-utils/auth-queries";
+import authRedis from "@/services/redis-service/auth-redis";
+import { StatusCode } from "@/types/index";
+import { UserDataType } from "@/types/auth-types";
+import { fieldValidator, isValidEmail } from "@/utils/helper-functions";
 
 
 class AuthCredentialControllers {

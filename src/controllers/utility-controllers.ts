@@ -1,11 +1,11 @@
 import { NextFunction, Request, Response } from "express";
-import { StatusCode } from "../types";
-import { errRes, errRouter } from "../error-handlers/error-responder";
-import db from "../prisma-utils/db-client";
-import { isValidEmail, otpGenerator } from '../utils/helper-functions';
-import authQueries from '../prisma-utils/auth-queries';
-import emailVerificationService from '../email-service/email-service';
-import authRedis from '../redis-service/auth-redis';
+import { StatusCode } from "@/types";
+import { errRes, errRouter } from "@/error-handlers/error-responder";
+import db from "@/prisma-utils/db-client";
+import { isValidEmail, otpGenerator } from '@/utils/helper-functions';
+import authQueries from '@/prisma-utils/auth-queries';
+import emailVerificationService from "@/services/email-service/email-service";
+import authRedis from "@/services/redis-service/auth-redis";
 
 
 class UtilityControllers {
@@ -96,6 +96,31 @@ class UtilityControllers {
 
     } catch (err) {
       throw err;
+    }
+  }
+
+
+  public async uploadDefaultImage(req: Request, res: Response, next: NextFunction) {
+
+    try {
+
+      const file = await db.file.create({
+        data: {
+          url: "https://newsglance-s3.s3.ap-south-1.amazonaws.com/default.jpg",
+          type: "image",
+          fileSize: 259,
+          name: "defaut.jpg",
+          isDefaultFile: true,
+        }
+      });
+
+      return res.status(StatusCode.OK).json({
+        message: "File uploaded!",
+        data: file,
+      });
+
+    } catch (err) {
+      return next(errRouter(err));
     }
   }
 

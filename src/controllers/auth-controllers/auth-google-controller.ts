@@ -1,10 +1,10 @@
 import { NextFunction, Request, Response } from "express";
-import { errRes, errRouter } from "../../error-handlers/error-responder";
+import { errRes, errRouter } from "@/error-handlers/error-responder";
 import { OAuth2Client, TokenPayload } from "google-auth-library";
-import { StatusCode } from "../../types";
-import authQueries from "../../prisma-utils/auth-queries";
-import { randomPasswordGenerator, randomUsernameGenerator } from "../../utils/helper-functions";
-import authToken from "../../middleware/auth-token";
+import { StatusCode } from "@/types";
+import authQueries from "@/prisma-utils/auth-queries";
+import { randomPasswordGenerator, randomUsernameGenerator } from "@/utils/helper-functions";
+import authToken from "@/middleware/auth-token";
 
 
 
