@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
-import { errRes } from "../error-handlers/error-responder";
-import { StatusCode } from "../types";
+import { errRes } from "@/error-handlers/error-responder";
+import { StatusCode } from "@/types";
 
 
 const otpValidator = (req: Request, res: Response, next: NextFunction) => {
