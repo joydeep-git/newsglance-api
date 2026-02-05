@@ -1,4 +1,4 @@
-import { UserDataType } from "./auth-types";
+import { UserDataType } from "@/types/auth-types";
 
 
 declare global {

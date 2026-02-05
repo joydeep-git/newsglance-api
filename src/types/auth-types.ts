@@ -1,4 +1,4 @@
-import { ImageFileType } from ".";
+import { FileDataType, ImageFileType } from "@/types/index";
 
 
 export type UserDataType = {
@@ -7,8 +7,8 @@ export type UserDataType = {
   username: string;
   email: string;
   password?: string;
-  avatarId: string | null;
-  avatar?: ImageFileType | null;
+  avatarId: string;
+  avatar?: FileDataType | null | undefined;
   newsBalance: number;
   audioBalance: number;
   isPremium: boolean;
