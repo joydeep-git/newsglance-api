@@ -52,14 +52,14 @@ class UserControllers {
 
       if (!fileTableRow) return next(errRes("File Table Error!", StatusCode.BAD_REQUEST));
 
-      const updateUser = await userQueries.updateAvatar({
+      const updatedUser = await userQueries.updateAvatar({
         userId: req.user.id,
         imageId: fileTableRow.id
       });
 
       return res.status(StatusCode.OK).json({
         message: "Avatar updated!",
-        data: updateUser,
+        data: updatedUser,
       });
 
     } catch (err) {
