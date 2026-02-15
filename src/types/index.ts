@@ -61,6 +61,7 @@ export interface FileDataType {
   fileSize: number;
   createdAt: Date;
   type: "image" | "audio";
+  isDefaultFile: boolean;
 };
 
 
