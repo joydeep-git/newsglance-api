@@ -1,3 +1,4 @@
+import { errorPrinter } from '@/error-handlers/error-responder';
 import dotenv from 'dotenv';
 import Redis from "ioredis";
 
@@ -15,9 +16,9 @@ class RedisService {
 
     this.redis = new Redis(this.redisUrl);
 
-    this.redis.on("connect", () => console.log("Redis Connected on", this.redisUrl));
+    this.redis.on("connect", () => errorPrinter("Redis Connected on", this.redisUrl));
 
-    this.redis.on("error", (err) => console.log("Redis Connection Error", this.redisUrl, ` Error: ${err}`));
+    this.redis.on("error", (err) => errorPrinter("Redis Connection Error", err));
 
   }
 

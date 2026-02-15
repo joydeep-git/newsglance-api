@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import { errRes, errRouter } from "@/error-handlers/error-responder";
+import { errorPrinter, errRes, errRouter } from "@/error-handlers/error-responder";
 import { ImageFileType, StatusCode } from "@/types/index";
 import userQueries from "@/prisma-utils/user-queries";
 import cloudStorage from "@/services/aws-service/s3";
@@ -46,8 +46,6 @@ class UserControllers {
 
     try {
 
-      console.log("update avatar :", req.user.avatar);
-
       const file = req.file;
 
       if (!file) return next(errRes("No file uploaded", StatusCode.BAD_REQUEST));
@@ -78,7 +76,7 @@ class UserControllers {
         await cloudStorage.deleteFile(req.user.avatar?.url!);
 
       } catch (err) {
-        console.log("Update Avatar cleanup failed!", err);
+        errorPrinter("Update Avatar cleanup failed!", err);
       }
 
 
@@ -98,8 +96,6 @@ class UserControllers {
 
     try {
 
-      console.log("delete avatar :", req.user.avatar);
-
       const updatedUser = await userQueries.deleteAvatar({ id: req.user.id });
 
       if (!updatedUser) {
@@ -116,7 +112,7 @@ class UserControllers {
         await cloudStorage.deleteFile(req.user.avatar?.url!);
 
       } catch (err) {
-        console.log("Delete Avatar cleanup failed!", err);
+        errorPrinter("Delete Avatar cleanup failed!", err);
       }
 
 
