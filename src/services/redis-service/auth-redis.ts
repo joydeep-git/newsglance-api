@@ -1,6 +1,7 @@
 import Redis from "ioredis";
 import { OtpType, UserDataType } from "@/types/auth-types";
 import redisService from "@/services/redis-service/redis-service";
+import { User } from "@prisma/client";
 
 class AuthRedis {
 
@@ -68,22 +69,25 @@ class AuthRedis {
 
 
   public async setUserData(userData: UserDataType): Promise<void> {
-    await this.redis.setex(`auth:user:${userData?.email}`, 600, JSON.stringify(userData));
+    await this.redis.setex(`auth:user:${userData.id}`, 600, JSON.stringify(userData));
   }
 
 
-  public async getUserData(userEmail: string): Promise<UserDataType | null> {
+  public async getUserData(userId: string): Promise<UserDataType | null> {
 
-    const data = await this.redis.get(`auth:user:${userEmail}`);
+    // return JSON.parse(await this.redis.get(`auth:user:${userId}`) ?? "") ?? null ;
+
+    const data = await this.redis.get(`auth:user:${userId}`);
 
     if (data) return JSON.parse(data);
 
     return null;
+
   }
 
 
-  public async deleteUserData(userEmail: string): Promise<void> {
-    await this.redis.del(`auth:user:${userEmail}`);
+  public async deleteUserData(id: string): Promise<void> {
+    await this.redis.del(`auth:user:${id}`);
   }
 
 
