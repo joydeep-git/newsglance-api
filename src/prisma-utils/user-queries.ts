@@ -40,6 +40,9 @@ const userQueries = {
         data: {
           avatarId: imageId,
         },
+        include: {
+          avatar: true,
+        }
       });
 
       if (data.password) delete data.password;
@@ -53,6 +56,59 @@ const userQueries = {
   },
 
 
+  // 
+  async updateUserAvatarWithFileDelete({
+    newFileUrl,
+    file,
+    userId,
+    oldAvatarId,
+  }: {
+    newFileUrl: string;
+    file: Express.Multer.File;
+    userId: string;
+    oldAvatarId: string;
+  }) {
+
+    return await db.$transaction(async (tx) => {
+
+      // create row in Files table
+      const newFile = await tx.file.create({
+        data: {
+          url: newFileUrl,
+          type: "image",
+          fileSize: file.size,
+          name: file?.originalname,
+        }
+      });
+
+
+      // update user with new file data
+      const updatedUser = await tx.user.update({
+        where: { id: userId },
+        data: { avatarId: newFile.id },
+        include: { avatar: true }
+      });
+
+
+      // check and delete old file row
+      if (oldAvatarId !== defaultAvatarId) {
+
+        await tx.file.delete({
+          where: {
+            id: oldAvatarId,
+            isDefaultFile: false,
+          },
+        })
+
+      }
+
+      return updatedUser;
+
+    })
+
+  },
+
+
   async deleteAvatar({ id }: { id: string; }): Promise<UserDataType> {
 
     try {
@@ -61,6 +117,9 @@ const userQueries = {
         where: { id },
         data: {
           avatarId: defaultAvatarId,
+        },
+        include: {
+          avatar: true,
         }
       });
 
