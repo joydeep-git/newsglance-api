@@ -16,7 +16,8 @@ class AuthGeneralControllers {
   public async logout(req: Request, res: Response, next: NextFunction) {
 
     try {
-      const token: string = req.token;
+
+      const { token } = req;
 
       res.clearCookie("token").status(StatusCode.OK).json({
         message: "Logged Out!",
@@ -40,10 +41,20 @@ class AuthGeneralControllers {
 
       if (!isValidEmail(email)) return next(errRes("Invalid Email!", StatusCode.BAD_REQUEST));
 
-      const isSamePassword = await argon2.verify(req.user.password!, password);
+
+      // get user data
+      const fetchUserData = await authQueries.findUser({ type: "email", value: email, getPassword: true })
+
+      if (!fetchUserData) return next(errRes("User not found! ", StatusCode.NOT_FOUND));
+      
+      
+      // verify password
+      const isSamePassword = await argon2.verify(fetchUserData?.password!, password);
 
       if (!isSamePassword) return next(errRes("Incorrect Password!", StatusCode.UNAUTHORIZED));
 
+
+      // verify OTP
       const isValidOtp = await authRedis.verifyOtp({ email, otp, type: "delete-account" });
 
       if (!isValidOtp) return next(errRes("Incorrect OTP!", StatusCode.BAD_REQUEST));
@@ -64,11 +75,13 @@ class AuthGeneralControllers {
         });
 
         try {
-          await cloudStorage.deleteFile(req.user.avatar?.url!);
 
-          await authRedis.deleteUserData(req.user.id);
+          await filesQueries.deleteFileRow({ type: "id", value: req?.user?.avatarId });
 
-          await filesQueries.deleteFileRow({ type: "id", value: req.user.avatarId });
+          await cloudStorage.deleteFile(req?.user?.avatar?.url!);
+
+          await authRedis.deleteUserData(req?.user?.id);
+
         } catch {
 
           null; // stopping sending any error
@@ -91,7 +104,7 @@ class AuthGeneralControllers {
 
     const user = req.user;
 
-    delete user.password;
+    if (user?.password) delete user.password;
 
     res.status(StatusCode.OK).json({
       message: "User data fetched!",
