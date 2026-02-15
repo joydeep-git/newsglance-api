@@ -6,6 +6,7 @@ import { isValidEmail, otpGenerator } from '@/utils/helper-functions';
 import authQueries from '@/prisma-utils/auth-queries';
 import emailVerificationService from "@/services/email-service/email-service";
 import authRedis from "@/services/redis-service/auth-redis";
+import { defaultAvatarUrl } from "@/utils/constants";
 
 
 class UtilityControllers {
@@ -18,13 +19,20 @@ class UtilityControllers {
 
       const { email, type } = req.body;
 
+
+      // verify email
       if (!isValidEmail(email)) return next(errRes("Please enter a valid email!", StatusCode.BAD_REQUEST));
 
+      
+      // checking if "login", "signup" given as type or not
       if ( type === "" || !type || type.length <= 0 ) return next(errRes("Type can not be empty!", StatusCode.BAD_REQUEST));
 
+
+      // check if account exists
       const user = await authQueries.findUser({ value: email, type: "email", getPassword: true });
 
-      // checking what kind of response is it
+
+      // checking what kind of response is it and response to user
       switch (type) {
 
         case "register":
@@ -38,22 +46,34 @@ class UtilityControllers {
           break;
 
         default:
-          return next(errRes("Invalid OTP type!", StatusCode.BAD_REQUEST));
+          return next(errRes("Invalid type!", StatusCode.BAD_REQUEST));
 
       }
+
+
 
       // create OTP
       const otp = otpGenerator();
 
+
+      // sending OTP
       const emailResponse = await emailVerificationService.sendOtp({ email, otp, type });
 
+
+
+      // if email sent successfully
       if (emailResponse.accepted.length > 0) {
 
+
+        // storing OTP for validation
         await authRedis.setOtp({ email, otp, type });
 
+
+        // storing user data in redis
         if (user) await authRedis.setUserData(user);
 
-        res.status(StatusCode.OK).json({
+        // FINAL
+        return res.status(StatusCode.OK).json({
           message: "Check your mail box for OTP!"
         })
 
@@ -87,9 +107,11 @@ class UtilityControllers {
         data: {
           newsBalance: 2,
           audioBalance: 2
-        }
+        },
       });
 
+
+      
       return res.status(StatusCode.OK).json({
         message: "Limit restored!"
       })
@@ -106,7 +128,7 @@ class UtilityControllers {
 
       const file = await db.file.create({
         data: {
-          url: "https://newsglance-s3.s3.ap-south-1.amazonaws.com/default.jpg",
+          url: defaultAvatarUrl,
           type: "image",
           fileSize: 259,
           name: "defaut.jpg",
