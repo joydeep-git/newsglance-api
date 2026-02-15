@@ -94,6 +94,9 @@ const authQueries = {
         },
         omit: {
           password: !getPassword
+        },
+        include: {
+          avatar: true,
         }
       })
 
