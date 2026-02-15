@@ -76,6 +76,10 @@ class AuthGeneralControllers {
 
         try {
 
+          await authRedis.deleteOtp({ type: "delete-account", email });
+
+          await authRedis.setBlacklistedToken(req?.token);
+
           await filesQueries.deleteFileRow({ type: "id", value: req?.user?.avatarId });
 
           await cloudStorage.deleteFile(req?.user?.avatar?.url!);
