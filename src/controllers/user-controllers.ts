@@ -4,9 +4,10 @@ import { ImageFileType, StatusCode } from "@/types/index";
 import userQueries from "@/prisma-utils/user-queries";
 import cloudStorage from "@/services/aws-service/s3";
 import filesQueries from "@/prisma-utils/files-queries";
+import authRedis from "@/services/redis-service/auth-redis";
 
 class UserControllers {
-  public num: number = 1;
+
 
   public async updateUser(req: Request, res: Response, next: NextFunction) {
 
@@ -24,6 +25,11 @@ class UserControllers {
 
       const updatedUser = await userQueries.updateUser({ id: req.user.id, data: updates });
 
+
+      // update redis
+      await authRedis.setUserData(updatedUser);
+
+
       return res.status(StatusCode.OK).json({
         message: "User data updated!",
         data: updatedUser,
@@ -40,22 +46,41 @@ class UserControllers {
 
     try {
 
+      console.log("update avatar :", req.user.avatar);
+
       const file = req.file;
 
       if (!file) return next(errRes("No file uploaded", StatusCode.BAD_REQUEST));
 
+
+      // upload file on AWS
       const fileUrl = await cloudStorage.uploadFile(file, "images");
 
       if (!fileUrl) return next(errRes("File upload failed", StatusCode.BAD_REQUEST));
 
-      const fileTableRow: ImageFileType = await filesQueries.createNewFile({ file, type: "image", url: fileUrl }) as ImageFileType;
 
-      if (!fileTableRow) return next(errRes("File Table Error!", StatusCode.BAD_REQUEST));
-
-      const updatedUser = await userQueries.updateAvatar({
+      // create new file row and update user
+      const updatedUser = await userQueries.updateUserAvatarWithFileDelete({
+        newFileUrl: fileUrl,
+        file,
         userId: req.user.id,
-        imageId: fileTableRow.id
+        oldAvatarId: req?.user?.avatar?.id!,
       });
+
+
+
+      try {
+
+        // update redis
+        await authRedis.setUserData(updatedUser);
+
+        // delete AWS file
+        await cloudStorage.deleteFile(req.user.avatar?.url!);
+
+      } catch (err) {
+        console.log("Update Avatar cleanup failed!", err);
+      }
+
 
       return res.status(StatusCode.OK).json({
         message: "Avatar updated!",
@@ -73,11 +98,29 @@ class UserControllers {
 
     try {
 
-      const data = await cloudStorage.deleteFile(req.user.avatar?.url!);
+      console.log("delete avatar :", req.user.avatar);
 
       const updatedUser = await userQueries.deleteAvatar({ id: req.user.id });
 
-      return res.status(200).json({
+      if (!updatedUser) {
+        return next(errRes("Avatar delete failed!", StatusCode.BAD_REQUEST));
+      }
+
+
+      try {
+
+        // update redis
+        await authRedis.setUserData(updatedUser);
+
+        // delete AWS file
+        await cloudStorage.deleteFile(req.user.avatar?.url!);
+
+      } catch (err) {
+        console.log("Delete Avatar cleanup failed!", err);
+      }
+
+
+      return res.status(StatusCode.OK).json({
         message: "Avatar deleted!",
         data: updatedUser,
       });
