@@ -56,7 +56,7 @@ const userQueries = {
   },
 
 
-  // 
+  // Create new File Row + Update User + Delete old file row
   async updateUserAvatarWithFileDelete({
     newFileUrl,
     file,
@@ -77,7 +77,7 @@ const userQueries = {
           url: newFileUrl,
           type: "image",
           fileSize: file.size,
-          name: file?.originalname,
+          name: file.originalname,
         }
       });
 
