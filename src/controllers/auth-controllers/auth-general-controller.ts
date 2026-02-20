@@ -46,8 +46,8 @@ class AuthGeneralControllers {
       const fetchUserData = await authQueries.findUser({ type: "email", value: email, getPassword: true })
 
       if (!fetchUserData) return next(errRes("User not found! ", StatusCode.NOT_FOUND));
-      
-      
+
+
       // verify password
       const isSamePassword = await argon2.verify(fetchUserData?.password!, password);
 
@@ -66,7 +66,7 @@ class AuthGeneralControllers {
 
       if (!deletedAccount) {
 
-        return next(errRes("Unable to delete account!", StatusCode.INTERNAL_SERVER_ERROR));
+        return next(errRes("Delete account failed!", StatusCode.INTERNAL_SERVER_ERROR));
 
       } else {
 
