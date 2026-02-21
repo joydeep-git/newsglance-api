@@ -4,7 +4,6 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
 }
 
 model User {
@@ -24,7 +23,7 @@ model User {
   comments Comment[]
   payments Payment[]
 
-  avatarId String @default("cml8xib0r0000qe0tfrv7xyhc")
+  avatarId String @default("cmlwboy0b0000oe0t2nssumzx")
   avatar   File   @relation("avatar", fields: [avatarId], references: [id], onDelete: SetDefault)
 
   createdAt DateTime @default(now())
