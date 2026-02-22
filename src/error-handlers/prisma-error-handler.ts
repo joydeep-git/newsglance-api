@@ -1,17 +1,17 @@
 import ErrorHandler from "@/error-handlers/error-handler";
 import { StatusCode } from "@/types";
-import { PrismaClientInitializationError, PrismaClientKnownRequestError, PrismaClientRustPanicError, PrismaClientValidationError } from "@prisma/client/runtime/library";
+import { Prisma } from "@prisma/client";
 import { errorPrinter } from "@/error-handlers/error-responder";
 
 
 
-const prismaErrorHandler = (err: any): ErrorHandler => {
+const prismaErrorHandler = (err: unknown): ErrorHandler => {
 
 
   errorPrinter("Prisma Error", err);
 
 
-  if (err instanceof PrismaClientKnownRequestError) {
+  if (err instanceof Prisma.PrismaClientKnownRequestError) {
 
     switch (err.code) {
 
@@ -46,7 +46,7 @@ const prismaErrorHandler = (err: any): ErrorHandler => {
   }
 
 
-  if (err instanceof PrismaClientValidationError) {
+  if (err instanceof Prisma.PrismaClientValidationError) {
     return new ErrorHandler({
       message: "Invalid data format provided.",
       status: StatusCode.BAD_REQUEST
@@ -54,7 +54,7 @@ const prismaErrorHandler = (err: any): ErrorHandler => {
   }
 
 
-  if (err instanceof PrismaClientInitializationError) {
+  if (err instanceof Prisma.PrismaClientInitializationError) {
     return new ErrorHandler({
       message: "Database connection failed. Please try again later.",
       status: StatusCode.SERVICE_UNAVAILABLE
@@ -62,7 +62,7 @@ const prismaErrorHandler = (err: any): ErrorHandler => {
   }
 
 
-  if (err instanceof PrismaClientRustPanicError) {
+  if (err instanceof Prisma.PrismaClientRustPanicError) {
     return new ErrorHandler({
       message: "Critical database error. Our team has been notified.",
       status: StatusCode.INTERNAL_SERVER_ERROR

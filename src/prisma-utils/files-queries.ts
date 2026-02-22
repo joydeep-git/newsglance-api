@@ -1,6 +1,7 @@
 import { errRouter } from "@/error-handlers/error-responder";
 import { AudioFileType, ImageFileType } from "@/types/index";
 import db from "@/prisma-utils/db-client";
+import { defaultAvatarId, defaultAvatarUrl } from "@/utils/constants";
 
 
 class FilesQueries {
@@ -49,10 +50,15 @@ class FilesQueries {
 
     try {
 
-      const where = type === "id" ? { id: value } : { url: value };
+      if ( value === defaultAvatarId || value === defaultAvatarUrl ) return null;
+
+      const key = type === "id" ? { id: value } : { url: value };
 
       return await db.file.delete({
-        where
+        where: {
+          ...key,
+          isDefaultFile: false
+        },
       });
 
     } catch (err) {

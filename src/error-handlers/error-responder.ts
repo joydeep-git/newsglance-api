@@ -2,7 +2,7 @@ import ErrorHandler from "@/error-handlers/error-handler";
 import prismaErrorHandler from "@/error-handlers/prisma-error-handler";
 import { StatusCode } from "@/types";
 import redisErrorHandler from "@/error-handlers/redis-error-handler";
-import { PrismaClientInitializationError, PrismaClientKnownRequestError, PrismaClientRustPanicError, PrismaClientValidationError } from "@prisma/client/runtime/library";
+import { Prisma } from "@prisma/client";
 import awsErrorHandler from "@/error-handlers/aws-error-handler";
 
 export const errRes = (message: string, status: number): ErrorHandler => {
@@ -61,19 +61,19 @@ export const errRouter = (err: unknown, fallbackMessage = "Internal Server Error
 
 
 
-export const isPrismaError = (err: any): err is PrismaClientKnownRequestError | PrismaClientValidationError | PrismaClientInitializationError | PrismaClientRustPanicError => {
+export const isPrismaError = (err: unknown): boolean => {
   return (
-    err instanceof PrismaClientKnownRequestError ||
-    err instanceof PrismaClientValidationError ||
-    err instanceof PrismaClientInitializationError ||
-    err instanceof PrismaClientRustPanicError
+    err instanceof Prisma.PrismaClientKnownRequestError ||
+    err instanceof Prisma.PrismaClientValidationError ||
+    err instanceof Prisma.PrismaClientInitializationError ||
+    err instanceof Prisma.PrismaClientRustPanicError
   );
 };
 
 
 
 
-export const isAWSError = (err: any): boolean => {
+export const isAWSError = (err: unknown): boolean => {
   return !!(err && typeof err === 'object' && '$metadata' in err);
 };
 
