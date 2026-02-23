@@ -21,7 +21,7 @@
     "docker:up": "docker compose up -d",
     "docker:down": "docker compose down -v",
     "docker:logs": "docker compose logs -f | cat",
-    "docker:dev": "docker compose up --build",
+    "docker:dev": "docker compose -f docker-compose.dev.yml up --build",
     "prisma:g": "prisma generate",
     "prisma:m": "prisma migrate dev --name init",
     "prisma:s": "prisma studio"
@@ -39,6 +39,7 @@
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.873.0",
+    "@prisma/adapter-pg": "^7.4.1",
     "@prisma/client": "^7.4.1",
     "@types/multer": "^2.0.0",
     "@types/npm": "^7.19.3",
