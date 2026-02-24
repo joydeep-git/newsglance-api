@@ -1,46 +1,64 @@
-# --- Stage 1: Build ---
-FROM node:24-alpine AS builder
-
-# Install build essentials for native modules like argon2
-RUN apk add --no-cache python3 make g++
+FROM node:22-slim AS builder
 
 WORKDIR /app
 
+# Install build dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    python3 \
+    make \
+    g++ \
+    pkg-config \
+    libssl-dev \
+  && rm -rf /var/lib/apt/lists/*
+
+# Copy package files
 COPY package*.json ./
-# Note: --no-cache is not a valid npm ci flag; use --quiet or omit
+
+# Install dependencies
 RUN npm ci
 
+# Copy source and schema
 COPY . .
 
-# Generate Prisma Client (Ensure it targets debian-openssl or musl)
+# Generate Prisma Client
 RUN npx prisma generate
 
-# Build TypeScript
+# Build application
 RUN npm run build
 
-# --- Stage 2: Production ---
-FROM node:24-alpine
-
-# Prisma needs openssl to run on Alpine
-RUN apk add --no-cache openssl
+# Production stage
+FROM node:22-slim AS runner
 
 WORKDIR /app
 
-# Copy only production dependencies to keep the image small
-COPY package*.json ./
-RUN npm ci --omit=dev
-
-# Copy the generated Prisma client and built source
-COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
-COPY --from=builder /app/node_modules/@prisma/client ./node_modules/@prisma/client
-COPY --from=builder /app/dist ./dist
-
-# Security: Run as non-root
-RUN addgroup --system app && adduser --system --ingroup app app
-USER app
-
+# Set environment variables
 ENV NODE_ENV=production
 ENV HOST=0.0.0.0
+ENV PORT=5000
+
+# Copy package files
+COPY package*.json ./
+
+# Install production dependencies only
+RUN npm ci --omit=dev && npm cache clean --force
+
+# Copy Prisma schema and migrations
+COPY prisma ./prisma
+
+# Copy compiled code and Prisma client from builder
+COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/node_modules/.prisma /app/node_modules/.prisma
+COPY --from=builder /app/node_modules/@prisma /app/node_modules/@prisma
+
+# Create non-root user
+RUN useradd --system --create-home --home-dir /home/appuser appuser && \
+    chown -R appuser:appuser /app
+
+USER appuser
+
 EXPOSE 5000
+
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+  CMD node -e "require('http').get('http://localhost:5000/api/health', (r) => {if (r.statusCode !== 200) throw new Error(r.statusCode)})"
 
 CMD ["node", "dist/server.js"]

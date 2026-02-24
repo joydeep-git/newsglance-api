@@ -16,7 +16,7 @@ CREATE TABLE "User" (
     "newsBalance" INTEGER NOT NULL DEFAULT 2,
     "audioBalance" INTEGER NOT NULL DEFAULT 2,
     "defaultCountry" TEXT NOT NULL DEFAULT 'IN',
-    "avatarId" TEXT NOT NULL DEFAULT 'cmlwboy0b0000oe0t2nssumzx',
+    "avatarId" TEXT NOT NULL DEFAULT 'cmlz9siht0000dn3hsd1zlpsp',
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 

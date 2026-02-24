@@ -1,5 +1,6 @@
 generator client {
-  provider = "prisma-client-js"
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
 }
 
 datasource db {
@@ -23,7 +24,7 @@ model User {
   comments Comment[]
   payments Payment[]
 
-  avatarId String @default("cmlz1uuhs00040tqoxd9dswsu")
+  avatarId String @default("cmlz9siht0000dn3hsd1zlpsp")
   avatar   File   @relation("avatar", fields: [avatarId], references: [id], onDelete: SetDefault)
 
   createdAt DateTime @default(now())
