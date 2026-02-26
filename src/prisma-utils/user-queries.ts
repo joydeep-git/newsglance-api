@@ -1,7 +1,7 @@
 import { errRouter } from "@/error-handlers/error-responder";
 import { UserDataType } from "@/types/auth-types";
-import { defaultAvatarId } from "@/utils/constants";
 import db from "@/prisma-utils/db-client";
+import authRedis from "@/services/redis-service/auth-redis";
 
 
 
@@ -18,7 +18,7 @@ const userQueries = {
         include: {
           avatar: true,
         },
-      });
+      }) as UserDataType;
 
       if (res?.password) delete res.password;
 
@@ -43,7 +43,7 @@ const userQueries = {
         include: {
           avatar: true,
         }
-      });
+      }) as UserDataType;
 
       if (data.password) delete data.password;
 
@@ -90,16 +90,16 @@ const userQueries = {
       });
 
 
-      // check and delete old file row
-      if (oldAvatarId !== defaultAvatarId) {
+      const oldFile = await tx.file.findFirst({
+        where: { id: oldAvatarId, isDefaultFile: false }
+      });
 
+
+      // delete old file only if its not default
+      if (oldFile) {
         await tx.file.delete({
-          where: {
-            id: oldAvatarId,
-            isDefaultFile: false,
-          },
-        })
-
+          where: { id: oldAvatarId },
+        });
       }
 
       return updatedUser;
@@ -113,15 +113,17 @@ const userQueries = {
 
     try {
 
+      const defaultId = await authRedis.getDefaultAvatarId();
+
       const data: UserDataType = await db.user.update({
         where: { id },
         data: {
-          avatarId: defaultAvatarId,
+          avatarId: defaultId,
         },
         include: {
           avatar: true,
         }
-      });
+      }) as UserDataType;
 
       if (data?.password) delete data.password;
 
@@ -130,6 +132,32 @@ const userQueries = {
     } catch (err) {
       throw errRouter(err);
     }
+
+  },
+
+
+
+  async resetLimit() {
+
+    await db.user.updateMany({
+      where: {
+        OR: [
+          {
+            planExpiryDate: {
+              lte: new Date() // expiry date was in past
+            }
+          },
+          {
+            planExpiryDate: null // never had a plan
+          }
+        ]
+      },
+      data: {
+        isPremium: false,
+        newsBalance: 2,
+        audioBalance: 2
+      },
+    });
 
   }
 

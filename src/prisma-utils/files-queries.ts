@@ -1,7 +1,6 @@
 import { errRouter } from "@/error-handlers/error-responder";
 import { AudioFileType, ImageFileType } from "@/types/index";
 import db from "@/prisma-utils/db-client";
-import { defaultAvatarId, defaultAvatarUrl } from "@/utils/constants";
 
 
 class FilesQueries {
@@ -20,6 +19,43 @@ class FilesQueries {
         }
       });
 
+    } catch (err) {
+      throw errRouter(err);
+    }
+
+  }
+
+
+  public async createDefaultFile(): Promise<ImageFileType> {
+
+    try {
+      const newFile: ImageFileType = await db.file.create({
+        data: {
+          url: "https://newsglance-s3.s3.ap-south-1.amazonaws.com/default.jpg",
+          type: "image",
+          fileSize: 259200,
+          name: "defaut.jpg",
+          isDefaultFile: true,
+        }
+      }) as ImageFileType;
+
+      return newFile;
+    } catch (err) {
+      throw errRouter(err);
+    }
+
+  }
+
+
+  public async findDefaultFile(): Promise<ImageFileType> {
+
+    try {
+      return await db.file.findFirstOrThrow({
+        where: {
+          isDefaultFile: true,
+          type: "image"
+        }
+      }) as ImageFileType;
     } catch (err) {
       throw errRouter(err);
     }
@@ -49,8 +85,6 @@ class FilesQueries {
   public async deleteFileRow({ type, value }: { type: "id" | "url"; value: string; }) {
 
     try {
-
-      if ( value === defaultAvatarId || value === defaultAvatarUrl ) return null;
 
       const key = type === "id" ? { id: value } : { url: value };
 

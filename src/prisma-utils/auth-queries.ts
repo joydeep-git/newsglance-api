@@ -2,8 +2,7 @@ import argon2 from 'argon2';
 import db from "@/prisma-utils/db-client"
 import { UserDataType } from '@/types/auth-types';
 import { Request } from 'express';
-import { errRes, errRouter } from '@/error-handlers/error-responder';
-import locationService from "@/services/location/locationService";
+import { errRouter } from '@/error-handlers/error-responder';
 
 
 const authQueries = {
@@ -27,7 +26,7 @@ const authQueries = {
         include: {
           avatar: true,
         }
-      });
+      }) as UserDataType;
 
     } catch (err) {
       throw errRouter(err);
@@ -39,10 +38,9 @@ const authQueries = {
 
     try {
 
-      const { username, email, name, password } = req.body;
+      const { username, email, name, password, avatarId } = req.body;
 
       const hashedPassword = await argon2.hash(password);
-
 
       const user: UserDataType = await db.user.create({
         data: {
@@ -50,6 +48,7 @@ const authQueries = {
           username,
           email,
           password: hashedPassword,
+          avatarId,
         },
         omit: {
           password: !getPassword
@@ -57,7 +56,7 @@ const authQueries = {
         include: {
           avatar: true
         }
-      });
+      }) as UserDataType;
 
       if (user.password) {
         delete user.password;
@@ -121,7 +120,7 @@ const authQueries = {
         include: {
           avatar: false,
         }
-      });
+      }) as UserDataType;
 
     } catch (err) {
       throw errRouter(err);
