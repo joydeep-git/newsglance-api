@@ -13,6 +13,14 @@
     "strict": true,
     "target": "ES2023",
     "ignoreDeprecations": "6.0",
+
+
+    // basic linting rules
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+
     "paths": {
       "@/*": [
         "./src/*"
