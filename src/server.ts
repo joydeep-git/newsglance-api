@@ -67,6 +67,8 @@ class Server {
 
     } catch (err) {
 
+      console.log("Server.ts RUN SERVER ERROR:", err);
+
       process.exit(1);
 
     }
