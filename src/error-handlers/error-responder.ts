@@ -91,7 +91,7 @@ export const errorPrinter = (type: string, err: unknown) => {
   const isDev: boolean = (process.env.NODE_ENV === "development") || false;
 
   if (isDev) {
-    console.log(`[${type}]`, err);
+    console.log(`[${type}]`, JSON.stringify(err));
   }
 
 }

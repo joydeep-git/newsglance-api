@@ -8,22 +8,36 @@ import { errorPrinter } from "@/error-handlers/error-responder";
 const prismaErrorHandler = (err: unknown): ErrorHandler => {
 
 
-  errorPrinter("Prisma Error", err);
+  errorPrinter("################################################ \n Prisma Error", err);
 
 
   if (err instanceof Prisma.PrismaClientKnownRequestError) {
 
     switch (err.code) {
 
-      case "P2002":
+      case "P2002": {
 
-        const target = (err.meta?.target as string[])?.join(", ") || "field";
+        let fieldName = "Field";
+
+        try {
+          const adapter = err.meta?.driverAdapterError as { cause?: { constraint?: { fields?: string[] } } } | undefined;
+          const raw = adapter?.cause?.constraint?.fields?.[0];
+          if (raw) fieldName = raw.charAt(0).toUpperCase() + raw.slice(1);
+        } catch {
+          // fallback to "Field" if structure is unexpected
+        }
+
+        // also check standard target as fallback for non-adapter environments
+        if (fieldName === "Field" && Array.isArray(err.meta?.target)) {
+          const raw = (err.meta.target as string[])[0];
+          if (raw) fieldName = raw.charAt(0).toUpperCase() + raw.slice(1);
+        }
 
         return new ErrorHandler({
-          message: `This ${target} is already taken. Please choose another.`,
+          message: `${fieldName} is already taken. Please choose another.`,
           status: StatusCode.CONFLICT
         });
-
+      }
 
       case "P2003":
         return new ErrorHandler({
