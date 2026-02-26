@@ -24,8 +24,8 @@ model User {
   comments Comment[]
   payments Payment[]
 
-  avatarId String @default("cmlz9siht0000dn3hsd1zlpsp")
-  avatar   File   @relation("avatar", fields: [avatarId], references: [id], onDelete: SetDefault)
+  avatarId String 
+  avatar   File   @relation("avatar", fields: [avatarId], references: [id], onDelete: Restrict)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
