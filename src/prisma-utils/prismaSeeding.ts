@@ -2,6 +2,7 @@ import db from "@/prisma-utils/db-client";
 import authRedis from "@/services/redis-service/auth-redis";
 import filesQueries from "./files-queries";
 import { ImageFileType } from "@/types";
+import { errorPrinter } from "@/error-handlers/error-responder";
 
 
 const prismaSeeding = async () => {
@@ -13,7 +14,7 @@ const prismaSeeding = async () => {
 
   if (file) {
     await authRedis.setDefaultAvatarId(file.id);
-    return console.log("Prisma Seeding : File exists!");
+    return errorPrinter("Prisma Seeding", "File exists!");
   }
 
 
@@ -22,11 +23,11 @@ const prismaSeeding = async () => {
   if (newFile) {
 
     await authRedis.setDefaultAvatarId(newFile.id);
-    
-    console.log("Prisma Seeding : File created!");
-  
+
+    errorPrinter("Prisma Seeding:", "File created!");
+
   } else {
-    console.log("Prisma Seeding ERROR : File creation failed!");
+    errorPrinter("Prisma Seeding ERROR:", "File creation failed!");
   }
 
 }
