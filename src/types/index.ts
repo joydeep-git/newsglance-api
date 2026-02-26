@@ -1,5 +1,3 @@
-import { extname } from "path";
-
 
 export enum StatusCode {
   OK = 200,
@@ -9,9 +7,9 @@ export enum StatusCode {
   FORBIDDEN = 403,
   NOT_FOUND = 404,
   CONFLICT = 409,
-  PAYLOAD_TOO_LARGE= 413,
+  PAYLOAD_TOO_LARGE = 413,
   INTERNAL_SERVER_ERROR = 500,
-  SERVICE_UNAVAILABLE= 503,
+  SERVICE_UNAVAILABLE = 503,
 }
 
 
@@ -54,31 +52,20 @@ export interface GeolocationData {
 
 
 
-export interface FileDataType {
+export interface FileDataType{
   id: string;
   name: string;
   url: string;
   fileSize: number;
   createdAt: Date;
-  type: "image" | "audio";
   isDefaultFile: boolean;
 };
 
 
 export interface ImageFileType extends FileDataType {
   type: "image";
-  id: string;
-  name: string;
-  url: string;
-  fileSize: number;
-  createdAt: Date;
-} 
+}
 
 export interface AudioFileType extends FileDataType {
   type: "audio";
-  id: string;
-  name: string;
-  url: string;
-  fileSize: number;
-  createdAt: Date;
 }
