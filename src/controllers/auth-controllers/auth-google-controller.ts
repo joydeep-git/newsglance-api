@@ -5,6 +5,7 @@ import { StatusCode } from "@/types";
 import authQueries from "@/prisma-utils/auth-queries";
 import { randomPasswordGenerator, randomUsernameGenerator } from "@/utils/helper-functions";
 import authToken from "@/middleware/auth-token";
+import authRedis from "@/services/redis-service/auth-redis";
 
 
 
@@ -23,7 +24,7 @@ class AuthGoogleController {
 
     try {
 
-      const { googleToken } = await req.body;
+      const { googleToken } = req.body;
 
       if (!googleToken) {
         return next(errRes("Google Token not found!", StatusCode.BAD_REQUEST));
@@ -45,7 +46,7 @@ class AuthGoogleController {
       } else {
 
         // find user
-        const user = await authQueries.findUser({ type: "email", value: payload.email!, getPassword: false });
+        const user = await authQueries.findUser({ type: "email", value: payload.email as string, getPassword: false });
 
         if (!user) {
 
@@ -54,6 +55,7 @@ class AuthGoogleController {
             email: payload.email,
             name: payload.name,
             password: randomPasswordGenerator(),
+            avatarId: await authRedis.getDefaultAvatarId(),
           }
 
           req.body = body;
@@ -78,9 +80,7 @@ class AuthGoogleController {
 
         } else {
 
-          const getUser = await authQueries.findUser({ type: "email", getPassword: false, value: payload.email! });
-
-          const token = authToken.cookieGenerator(getUser?.id!);
+          const token = authToken.cookieGenerator(user.id);
 
           if (!token) return next(errRes("Unable to login! Please try again.", StatusCode.INTERNAL_SERVER_ERROR));
 

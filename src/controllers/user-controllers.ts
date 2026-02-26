@@ -1,10 +1,10 @@
 import { NextFunction, Request, Response } from "express";
 import { errorPrinter, errRes, errRouter } from "@/error-handlers/error-responder";
-import { ImageFileType, StatusCode } from "@/types/index";
+import { StatusCode } from "@/types/index";
 import userQueries from "@/prisma-utils/user-queries";
 import cloudStorage from "@/services/aws-service/s3";
-import filesQueries from "@/prisma-utils/files-queries";
 import authRedis from "@/services/redis-service/auth-redis";
+import { UserDataType } from "@/types/auth-types";
 
 class UserControllers {
 
@@ -62,7 +62,7 @@ class UserControllers {
         newFileUrl: fileUrl,
         file,
         userId: req.user.id,
-        oldAvatarId: req?.user?.avatar?.id!,
+        oldAvatarId: req.user.avatarId,
       });
 
 
@@ -70,10 +70,10 @@ class UserControllers {
       try {
 
         // update redis
-        await authRedis.setUserData(updatedUser);
+        await authRedis.setUserData(updatedUser as UserDataType);
 
         // delete AWS file
-        await cloudStorage.deleteFile(req.user.avatar?.url!);
+        await cloudStorage.deleteFile(req.user.avatar?.url);
 
       } catch (err) {
         errorPrinter("Update Avatar cleanup failed!", err);
@@ -109,7 +109,7 @@ class UserControllers {
         await authRedis.setUserData(updatedUser);
 
         // delete AWS file
-        await cloudStorage.deleteFile(req.user.avatar?.url!);
+        await cloudStorage.deleteFile(req.user.avatar?.url);
 
       } catch (err) {
         errorPrinter("Delete Avatar cleanup failed!", err);

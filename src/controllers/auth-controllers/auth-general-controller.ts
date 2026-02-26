@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { StatusCode } from "@/types/index";
-import { errRes, errRouter } from "@/error-handlers/error-responder";
+import { errorPrinter, errRes, errRouter } from "@/error-handlers/error-responder";
 import { isValidEmail } from "@/utils/helper-functions";
 import * as argon2 from "argon2";
 import authQueries from "@/prisma-utils/auth-queries";
@@ -49,7 +49,7 @@ class AuthGeneralControllers {
 
 
       // verify password
-      const isSamePassword = await argon2.verify(fetchUserData?.password!, password);
+      const isSamePassword = await argon2.verify(fetchUserData.password as string, password);
 
       if (!isSamePassword) return next(errRes("Incorrect Password!", StatusCode.UNAUTHORIZED));
 
@@ -80,15 +80,15 @@ class AuthGeneralControllers {
 
           await authRedis.setBlacklistedToken(req?.token);
 
-          await filesQueries.deleteFileRow({ type: "id", value: req?.user?.avatarId });
+          await filesQueries.deleteFileRow({ type: "id", value: req.user.avatarId });
 
-          await cloudStorage.deleteFile(req?.user?.avatar?.url!);
+          await cloudStorage.deleteFile(req.user.avatar.url);
 
-          await authRedis.deleteUserData(req?.user?.id);
+          await authRedis.deleteUserData(req.user.id);
 
-        } catch {
+        } catch (err) {
 
-          null; // stopping sending any error
+          errorPrinter("Delete Account failed!", err);
 
         }
 
@@ -104,7 +104,7 @@ class AuthGeneralControllers {
 
 
   // verify token
-  public async verifyToken(req: Request, res: Response, next: NextFunction) {
+  public async verifyToken(req: Request, res: Response ) {
 
     const user = req.user;
 
