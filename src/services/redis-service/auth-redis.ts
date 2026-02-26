@@ -1,7 +1,7 @@
 import Redis from "ioredis";
 import { OtpType, UserDataType } from "@/types/auth-types";
 import redisService from "@/services/redis-service/redis-service";
-import { User } from "@prisma/client";
+import filesQueries from "@/prisma-utils/files-queries";
 
 class AuthRedis {
 
@@ -38,7 +38,7 @@ class AuthRedis {
     const validOtp: boolean = await this.verifyOtp({ email, otp, type: "forget-password" });
 
     if (validOtp) {
-      this.redis.setex(`auth:verified:${email + otp}`, 600, "true");
+      await this.redis.setex(`auth:verified:${email + otp}`, 600, "true");
     }
   }
 
@@ -88,6 +88,23 @@ class AuthRedis {
 
   public async deleteUserData(id: string): Promise<void> {
     await this.redis.del(`auth:user:${id}`);
+  }
+
+
+  public async setDefaultAvatarId(id: string): Promise<void> {
+    await this.redis.set(`user:defaultAvatar`, id);
+  }
+
+  public async getDefaultAvatarId(): Promise<string> {
+
+    let id: string | null = await this.redis.get(`user:defaultAvatar`);
+
+    if (!id) {
+      id = (await filesQueries.findDefaultFile()).id;
+      await this.setDefaultAvatarId(id);
+    }
+
+    return id;
   }
 
 

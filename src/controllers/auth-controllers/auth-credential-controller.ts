@@ -1,11 +1,11 @@
 import argon2 from "argon2";
-import { NextFunction, Request, Response } from "express";
+import type { NextFunction, Request, Response } from "express";
 import { errRes, errRouter } from "@/error-handlers/error-responder";
 import authToken from "@/middleware/auth-token";
 import authQueries from "@/prisma-utils/auth-queries";
 import authRedis from "@/services/redis-service/auth-redis";
 import { StatusCode } from "@/types/index";
-import { UserDataType } from "@/types/auth-types";
+import type { UserDataType } from "@/types/auth-types";
 import { fieldValidator, isValidEmail } from "@/utils/helper-functions";
 
 
@@ -17,7 +17,7 @@ class AuthCredentialControllers {
 
     try {
 
-      const { username, email, otp } = req.body;
+      const { username, email, otp }: { username: string, email: string, otp: string } = req.body;
 
 
       // check missing fields
@@ -29,11 +29,10 @@ class AuthCredentialControllers {
       // check if username exists
       const existingUsername = await authQueries.findUser({ value: username, type: "username" });
 
-      if (existingUsername) {
-        return next(errRes("Username already exists!", StatusCode.CONFLICT));
-      }
+      if (existingUsername) return next(errRes("Username already exists!", StatusCode.CONFLICT));
 
 
+      
       // check email for account and validity
       if (!isValidEmail(email)) return next(errRes("Invalid Email!", StatusCode.BAD_REQUEST));
 
@@ -48,6 +47,10 @@ class AuthCredentialControllers {
       const otpVerified = await authRedis.verifyOtp({ email, otp, type: "register" });
 
       if (!otpVerified) return next(errRes("Incorrect OTP!", StatusCode.BAD_REQUEST));
+
+
+      // fetch avatar
+      req.body.avatarId = await authRedis.getDefaultAvatarId();
 
       // create user
       const newUser: UserDataType = await authQueries.createNewUser({ req });
@@ -94,13 +97,13 @@ class AuthCredentialControllers {
 
 
       // get account details
-      let fetchUserData: UserDataType | null = await authQueries.findUser({ type: "email", value: email, getPassword: true });
+      const fetchUserData: UserDataType | null = await authQueries.findUser({ type: "email", value: email, getPassword: true });
 
       if (!fetchUserData) return next(errRes("No Account Found!", StatusCode.BAD_REQUEST));
 
 
       // checking password
-      const isSamePassword = await argon2.verify(fetchUserData?.password!, password);
+      const isSamePassword = await argon2.verify(fetchUserData.password as string, password);
 
       if (!isSamePassword) return next(errRes("Incorrect Password!", StatusCode.UNAUTHORIZED));
 
@@ -159,7 +162,7 @@ class AuthCredentialControllers {
 
 
       // fetch user data
-      let user: UserDataType | null = await authQueries.findUser({ type: "email", value: email, getPassword: false });
+      const user: UserDataType | null = await authQueries.findUser({ type: "email", value: email, getPassword: false });
 
       if (!user) return next(errRes("No account found!", StatusCode.NOT_FOUND));
 
