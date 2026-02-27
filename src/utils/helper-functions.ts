@@ -63,7 +63,7 @@ export const otpGenerator = (): string => {
 
 
 
-export const randomUsernameGenerator = (name?: string) => {
+export const randomUsernameGenerator = (name?: string): string => {
 
   const baseName: string = name?.trim().toLowerCase() ?? "User_";
 
@@ -73,7 +73,7 @@ export const randomUsernameGenerator = (name?: string) => {
 }
 
 
-export const randomPasswordGenerator = (length = 12) => {
+export const randomPasswordGenerator = (length = 12): string => {
 
   const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+-=[]{}|;:,.<>?';
 

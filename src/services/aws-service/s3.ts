@@ -84,7 +84,18 @@ class CloudStorage {
 
     try {
 
-      if (!url.includes("s3.ap-south-1.amazonaws.com/")) return { deleted: false, message: "Invalid URL" };
+      try {
+
+        const parsed = new URL(url);
+
+        const expectedHost = `${this.bucketName}.s3.${this.region}.amazonaws.com`;
+
+        if (parsed.hostname !== expectedHost) return { deleted: false, message: "Invalid URL" };
+
+      } catch (err) {
+        return { deleted: false, message: "Invalid URL" };
+      }
+
 
       if (this.defaultImageUrl && url === this.defaultImageUrl) return {
         deleted: false,

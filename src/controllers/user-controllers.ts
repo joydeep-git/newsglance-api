@@ -1,12 +1,13 @@
 import { NextFunction, Request, Response } from "express";
-import { errRes, errRouter } from "@/error-handlers/error-responder";
-import { ImageFileType, StatusCode } from "@/types/index";
+import { errorPrinter, errRes, errRouter } from "@/error-handlers/error-responder";
+import { StatusCode } from "@/types/index";
 import userQueries from "@/prisma-utils/user-queries";
 import cloudStorage from "@/services/aws-service/s3";
-import filesQueries from "@/prisma-utils/files-queries";
+import authRedis from "@/services/redis-service/auth-redis";
+import { UserDataType } from "@/types/auth-types";
 
 class UserControllers {
-  public num: number = 1;
+
 
   public async updateUser(req: Request, res: Response, next: NextFunction) {
 
@@ -14,7 +15,7 @@ class UserControllers {
 
       const updates: Record<string, string> = {};
 
-      const validFields = ["username", "email", "avatar", "name", "country"];
+      const validFields = ["username", "name", "defaultCountry"];
 
       for (const key of validFields) {
         if (req.body[key]) updates[key] = req.body[key];
@@ -23,6 +24,11 @@ class UserControllers {
       if (!Object.keys(updates).length) return next(errRes("No fields to update", StatusCode.BAD_REQUEST));
 
       const updatedUser = await userQueries.updateUser({ id: req.user.id, data: updates });
+
+
+      // update redis
+      await authRedis.setUserData(updatedUser);
+
 
       return res.status(StatusCode.OK).json({
         message: "User data updated!",
@@ -44,22 +50,39 @@ class UserControllers {
 
       if (!file) return next(errRes("No file uploaded", StatusCode.BAD_REQUEST));
 
+
+      // upload file on AWS
       const fileUrl = await cloudStorage.uploadFile(file, "images");
 
       if (!fileUrl) return next(errRes("File upload failed", StatusCode.BAD_REQUEST));
 
-      const fileTableRow: ImageFileType = await filesQueries.createNewFile({ file, type: "image", url: fileUrl }) as ImageFileType;
 
-      if (!fileTableRow) return next(errRes("File Table Error!", StatusCode.BAD_REQUEST));
-
-      const updateUser = await userQueries.updateAvatar({
+      // create new file row and update user
+      const updatedUser = await userQueries.updateUserAvatarWithFileDelete({
+        newFileUrl: fileUrl,
+        file,
         userId: req.user.id,
-        imageId: fileTableRow.id
+        oldAvatarId: req.user.avatarId,
       });
+
+
+
+      try {
+
+        // update redis
+        await authRedis.setUserData(updatedUser as UserDataType);
+
+        // delete AWS file
+        await cloudStorage.deleteFile(req.user.avatar?.url);
+
+      } catch (err) {
+        errorPrinter("Update Avatar cleanup failed!", err);
+      }
+
 
       return res.status(StatusCode.OK).json({
         message: "Avatar updated!",
-        data: updateUser,
+        data: updatedUser,
       });
 
     } catch (err) {
@@ -73,11 +96,27 @@ class UserControllers {
 
     try {
 
-      const data = await cloudStorage.deleteFile(req.user.avatar?.url!);
-
       const updatedUser = await userQueries.deleteAvatar({ id: req.user.id });
 
-      return res.status(200).json({
+      if (!updatedUser) {
+        return next(errRes("Avatar delete failed!", StatusCode.BAD_REQUEST));
+      }
+
+
+      try {
+
+        // update redis
+        await authRedis.setUserData(updatedUser);
+
+        // delete AWS file
+        await cloudStorage.deleteFile(req.user.avatar?.url);
+
+      } catch (err) {
+        errorPrinter("Delete Avatar cleanup failed!", err);
+      }
+
+
+      return res.status(StatusCode.OK).json({
         message: "Avatar deleted!",
         data: updatedUser,
       });

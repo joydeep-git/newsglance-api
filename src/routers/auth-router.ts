@@ -49,7 +49,7 @@ class AuthRouters {
 
     this.router.get("/logout", authGeneralControllers.logout);
 
-    this.router.delete("/delete", authGeneralControllers.deleteAccount);
+    this.router.delete("/delete", authToken.validator, authGeneralControllers.deleteAccount);
 
     this.router.get("/verify-token", authToken.validator, authGeneralControllers.verifyToken);
 

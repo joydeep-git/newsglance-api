@@ -3,7 +3,6 @@ import db from "@/prisma-utils/db-client"
 import { UserDataType } from '@/types/auth-types';
 import { Request } from 'express';
 import { errRouter } from '@/error-handlers/error-responder';
-import locationService from "@/services/location/locationService";
 
 
 const authQueries = {
@@ -13,7 +12,7 @@ const authQueries = {
     value: string;
     type: "email" | "username" | "id";
     getPassword?: boolean;
-  }): Promise<UserDataType | null > {
+  }): Promise<UserDataType | null> {
 
     try {
 
@@ -27,7 +26,7 @@ const authQueries = {
         include: {
           avatar: true,
         }
-      });
+      }) as UserDataType;
 
     } catch (err) {
       throw errRouter(err);
@@ -39,23 +38,17 @@ const authQueries = {
 
     try {
 
-      const { username, email, name, password } = req.body;
+      const { username, email, name, password, avatarId } = req.body;
 
       const hashedPassword = await argon2.hash(password);
 
-      let country: string | null = null;
-
-      if (req.ip) {
-        country = await locationService.getLocation(req.ip!)
-      }
-
-      return await db.user.create({
+      const user: UserDataType = await db.user.create({
         data: {
           name,
           username,
           email,
           password: hashedPassword,
-          defaultCountry: country ?? "IN",
+          avatarId,
         },
         omit: {
           password: !getPassword
@@ -63,7 +56,13 @@ const authQueries = {
         include: {
           avatar: true
         }
-      });
+      }) as UserDataType;
+
+      if (user.password) {
+        delete user.password;
+      }
+
+      return user;
 
     } catch (err) {
       throw errRouter(err);
@@ -94,6 +93,9 @@ const authQueries = {
         },
         omit: {
           password: !getPassword
+        },
+        include: {
+          avatar: true,
         }
       })
 
@@ -115,7 +117,10 @@ const authQueries = {
         omit: {
           password: true
         },
-      });
+        include: {
+          avatar: false,
+        }
+      }) as UserDataType;
 
     } catch (err) {
       throw errRouter(err);

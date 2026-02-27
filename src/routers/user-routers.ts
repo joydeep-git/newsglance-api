@@ -13,11 +13,9 @@ class UserRouters {
 
     this.router.patch("/update", authToken.validator,  userControllers.updateUser);
 
-    this.router.patch("/avatar", multerConfig.upload.single("avatar"), userControllers.updateAvatar);
+    this.router.patch("/avatar", authToken.validator, multerConfig.upload.single("avatar"), userControllers.updateAvatar);
 
-    this.router.delete("/avatar", authToken.validator, userControllers.updateAvatar);
-
-    this.router.post("/delete", userControllers.deleteAvatar);
+    this.router.delete("/avatar", authToken.validator, userControllers.deleteAvatar);
 
   }
 

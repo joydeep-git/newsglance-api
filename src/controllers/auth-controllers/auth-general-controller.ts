@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { StatusCode } from "@/types/index";
-import { errRes, errRouter } from "@/error-handlers/error-responder";
+import { errorPrinter, errRes, errRouter } from "@/error-handlers/error-responder";
 import { isValidEmail } from "@/utils/helper-functions";
 import * as argon2 from "argon2";
 import authQueries from "@/prisma-utils/auth-queries";
@@ -16,7 +16,8 @@ class AuthGeneralControllers {
   public async logout(req: Request, res: Response, next: NextFunction) {
 
     try {
-      const token: string = req.token;
+
+      const { token } = req;
 
       res.clearCookie("token").status(StatusCode.OK).json({
         message: "Logged Out!",
@@ -40,10 +41,20 @@ class AuthGeneralControllers {
 
       if (!isValidEmail(email)) return next(errRes("Invalid Email!", StatusCode.BAD_REQUEST));
 
-      const isSamePassword = await argon2.verify(req.user.password!, password);
+
+      // get user data
+      const fetchUserData = await authQueries.findUser({ type: "email", value: email, getPassword: true })
+
+      if (!fetchUserData) return next(errRes("User not found! ", StatusCode.NOT_FOUND));
+
+
+      // verify password
+      const isSamePassword = await argon2.verify(fetchUserData.password as string, password);
 
       if (!isSamePassword) return next(errRes("Incorrect Password!", StatusCode.UNAUTHORIZED));
 
+
+      // verify OTP
       const isValidOtp = await authRedis.verifyOtp({ email, otp, type: "delete-account" });
 
       if (!isValidOtp) return next(errRes("Incorrect OTP!", StatusCode.BAD_REQUEST));
@@ -55,7 +66,7 @@ class AuthGeneralControllers {
 
       if (!deletedAccount) {
 
-        return next(errRes("Unable to delete account!", StatusCode.INTERNAL_SERVER_ERROR));
+        return next(errRes("Delete account failed!", StatusCode.INTERNAL_SERVER_ERROR));
 
       } else {
 
@@ -64,14 +75,20 @@ class AuthGeneralControllers {
         });
 
         try {
-          await cloudStorage.deleteFile(req.user.avatar?.url!);
+
+          await authRedis.deleteOtp({ type: "delete-account", email });
+
+          await authRedis.setBlacklistedToken(req?.token);
+
+          await filesQueries.deleteFileRow({ type: "id", value: req.user.avatarId });
+
+          await cloudStorage.deleteFile(req.user.avatar.url);
 
           await authRedis.deleteUserData(req.user.id);
 
-          await filesQueries.deleteFileRow({ type: "id", value: req.user.avatarId });
-        } catch {
+        } catch (err) {
 
-          null; // stopping sending any error
+          errorPrinter("Delete Account failed!", err);
 
         }
 
@@ -87,11 +104,11 @@ class AuthGeneralControllers {
 
 
   // verify token
-  public async verifyToken(req: Request, res: Response, next: NextFunction) {
+  public async verifyToken(req: Request, res: Response ) {
 
     const user = req.user;
 
-    delete user.password;
+    if (user?.password) delete user.password;
 
     res.status(StatusCode.OK).json({
       message: "User data fetched!",

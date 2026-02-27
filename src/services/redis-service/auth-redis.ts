@@ -1,6 +1,7 @@
 import Redis from "ioredis";
 import { OtpType, UserDataType } from "@/types/auth-types";
 import redisService from "@/services/redis-service/redis-service";
+import filesQueries from "@/prisma-utils/files-queries";
 
 class AuthRedis {
 
@@ -37,7 +38,7 @@ class AuthRedis {
     const validOtp: boolean = await this.verifyOtp({ email, otp, type: "forget-password" });
 
     if (validOtp) {
-      this.redis.setex(`auth:verified:${email + otp}`, 600, "true");
+      await this.redis.setex(`auth:verified:${email + otp}`, 600, "true");
     }
   }
 
@@ -68,22 +69,42 @@ class AuthRedis {
 
 
   public async setUserData(userData: UserDataType): Promise<void> {
-    await this.redis.setex(`auth:user:${userData?.email}`, 600, JSON.stringify(userData));
+    await this.redis.setex(`auth:user:${userData.id}`, 600, JSON.stringify(userData));
   }
 
 
-  public async getUserData(userEmail: string): Promise<UserDataType | null> {
+  public async getUserData(userId: string): Promise<UserDataType | null> {
 
-    const data = await this.redis.get(`auth:user:${userEmail}`);
+    // return JSON.parse(await this.redis.get(`auth:user:${userId}`) ?? "") ?? null ;
+
+    const data = await this.redis.get(`auth:user:${userId}`);
 
     if (data) return JSON.parse(data);
 
     return null;
+
   }
 
 
-  public async deleteUserData(userEmail: string): Promise<void> {
-    await this.redis.del(`auth:user:${userEmail}`);
+  public async deleteUserData(id: string): Promise<void> {
+    await this.redis.del(`auth:user:${id}`);
+  }
+
+
+  public async setDefaultAvatarId(id: string): Promise<void> {
+    await this.redis.set(`user:defaultAvatar`, id);
+  }
+
+  public async getDefaultAvatarId(): Promise<string> {
+
+    let id: string | null = await this.redis.get(`user:defaultAvatar`);
+
+    if (!id) {
+      id = (await filesQueries.findDefaultFile()).id;
+      await this.setDefaultAvatarId(id);
+    }
+
+    return id;
   }
 
 

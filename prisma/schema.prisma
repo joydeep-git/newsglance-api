@@ -1,10 +1,10 @@
 generator client {
-  provider = "prisma-client-js"
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
 }
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
 }
 
 model User {
@@ -24,8 +24,8 @@ model User {
   comments Comment[]
   payments Payment[]
 
-  avatarId String @default("cml8xib0r0000qe0tfrv7xyhc")
-  avatar   File   @relation("avatar", fields: [avatarId], references: [id], onDelete: SetDefault)
+  avatarId String 
+  avatar   File   @relation("avatar", fields: [avatarId], references: [id], onDelete: Restrict)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

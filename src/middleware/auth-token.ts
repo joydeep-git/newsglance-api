@@ -30,42 +30,57 @@ class AuthToken {
   public async validator(req: Request, res: Response, next: NextFunction) {
 
     try {
+      
 
+      // getting TOKEN from headers
       const token: string = req.cookies.token || req.headers.cookie?.split("=")[1] || req.headers.authorization?.split(" ")[1];
 
       if (!token) return next(errRes("No Active Session! Please Login!", StatusCode.UNAUTHORIZED));
 
+
+      // checking if token is blacklisted
       const blacklistedToken = await authRedis.getBlacklistedToken(token);
 
-      if (blacklistedToken) return res.clearCookie("token").status(StatusCode.UNAUTHORIZED).json({
-        message: "Session expired! Please Login"
-      })
+      if (blacklistedToken) {
+        return res.clearCookie("token").status(StatusCode.UNAUTHORIZED).json({
+          message: "Session expired! Please Login"
+        });
+      }
+
+
 
       // decode token
       const { id } = jwt.verify(token, process.env.JWT_SECRET_KEY!) as JwtPayload;
 
+
+      // fetching data from cache
       let user: UserDataType | null = await authRedis.getUserData(id);
 
       if (!user) {
 
-        user = await authQueries.findUser({ type: "id", value: id, getPassword: true });
+
+        // If not in redis then check db
+        const response = await authQueries.findUser({ type: "id", value: id, getPassword: false });
+
+        if (!response) {
+          return next(errRes("No User found! Please sign in", StatusCode.NOT_FOUND));
+        }
+
+        // removing password from res
+        if (response?.password) delete response.password;
+
+        user = response;
+
+        await authRedis.setUserData(response);
 
       }
 
-      if (!user) {
 
-        return next(errRes("No User found! Please sign in", StatusCode.NOT_FOUND));
+      req.user = user;
 
-      } else {
+      req.token = token;
 
-        await authRedis.setUserData(user);
-
-        req.user = user;
-        req.token = token;
-
-        next();
-
-      }
+      next();
 
     } catch (err) {
 

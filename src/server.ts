@@ -8,13 +8,16 @@ import cors from "cors";
 
 import errorMiddleware from "@/error-handlers/error-middleware";
 import routeErrorHandler from "@/middleware/route-error-handler";
+import { responseWrapper } from "@/middleware/response-wrapper";
 
 import authRouters from "@/routers/auth-router";
 import userRouters from "@/routers/user-routers";
 import newsRouters from "@/routers/news-routers";
 import utilityRouters from "@/routers/utility-routers";
-import { responseWrapper } from "@/middleware/response-wrapper";
 
+import prismaSeeding from "./prisma-utils/prismaSeeding";
+
+// Redis
 import redisService from "@/services/redis-service/redis-service";
 
 // AWS services
@@ -60,7 +63,11 @@ class Server {
 
       this.startServer();
 
+      void prismaSeeding().catch(err => console.log("Prisma Seeding ERROR:", err));
+
     } catch (err) {
+
+      console.log("Server.ts RUN SERVER ERROR:", err);
 
       process.exit(1);
 
