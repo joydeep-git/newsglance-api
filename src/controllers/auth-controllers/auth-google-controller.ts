@@ -56,6 +56,8 @@ class AuthGoogleController {
             name: payload.name,
             password: randomPasswordGenerator(),
             avatarId: await authRedis.getDefaultAvatarId(),
+            defaultCountry: "IN",
+            phoneNumber: "9876543210",
           }
 
           req.body = body;

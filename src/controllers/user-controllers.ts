@@ -15,7 +15,7 @@ class UserControllers {
 
       const updates: Record<string, string> = {};
 
-      const validFields = ["username", "name", "defaultCountry"];
+      const validFields = ["username", "name", "defaultCountry", "phoneNumber" ];
 
       for (const key of validFields) {
         if (req.body[key]) updates[key] = req.body[key];

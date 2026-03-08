@@ -17,11 +17,11 @@ class AuthCredentialControllers {
 
     try {
 
-      const { username, email, otp }: { username: string, email: string, otp: string } = req.body;
+      const { username, email, otp }: { username: string; email: string; otp: string; } = req.body;
 
 
       // check missing fields
-      const missingField = fieldValidator(["username", "name", "email", "password", "otp"], req);
+      const missingField = fieldValidator(["username", "name", "email", "password", "otp", "phoneNumber", "defaultCountry"], req);
 
       if (missingField) return next(errRes(`${missingField} is required!`, StatusCode.BAD_REQUEST));
 
@@ -40,6 +40,14 @@ class AuthCredentialControllers {
 
       if (existingEmail) {
         return next(errRes("Email already exists!", StatusCode.CONFLICT));
+      }
+
+
+      // check phone number for account
+      const existingPhoneNumber = await authQueries.findUser({ value: req.body.phoneNumber, type: "phoneNumber", getPassword: false });
+
+      if (existingPhoneNumber) {
+        return next(errRes("Phone number already exists!", StatusCode.CONFLICT));
       }
 
 

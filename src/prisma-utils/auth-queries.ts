@@ -10,7 +10,7 @@ const authQueries = {
 
   async findUser({ value, type = "email", getPassword = false }: {
     value: string;
-    type: "email" | "username" | "id";
+    type: "email" | "username" | "id" | "phoneNumber";
     getPassword?: boolean;
   }): Promise<UserDataType | null> {
 
@@ -38,7 +38,7 @@ const authQueries = {
 
     try {
 
-      const { username, email, name, password, avatarId } = req.body;
+      const { username, email, name, password, avatarId, defaultCountry, phoneNumber } = req.body;
 
       const hashedPassword = await argon2.hash(password);
 
@@ -48,6 +48,8 @@ const authQueries = {
           username,
           email,
           password: hashedPassword,
+          defaultCountry,
+          phoneNumber,
           avatarId,
         },
         omit: {
