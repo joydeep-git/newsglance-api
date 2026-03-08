@@ -6,6 +6,7 @@ export type UserDataType = {
   name: string;
   username: string;
   email: string;
+  phoneNumber: string;
   password?: string;
   avatarId: string;
   avatar: ImageFileType;

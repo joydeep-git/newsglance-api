@@ -69,3 +69,11 @@ export interface ImageFileType extends FileDataType {
 export interface AudioFileType extends FileDataType {
   type: "audio";
 }
+
+
+export type CountryMapType = {
+  name: string;
+  countrycode: string;
+  currency: string;
+  flag: string;
+}
