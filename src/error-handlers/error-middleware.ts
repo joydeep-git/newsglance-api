@@ -1,14 +1,13 @@
 
-import { NextFunction, Request, Response } from "express";
+import { Request, Response } from "express";
 import { StatusCode } from "@/types";
 import ErrorHandler from "@/error-handlers/error-handler";
 
 
 const errorMiddleware = (
   err: ErrorHandler | Error | any,
-  req: Request,
+  _: Request,
   res: Response,
-  next: NextFunction
 ) => {
 
   const statusCode = err instanceof ErrorHandler ? err.statusCode : StatusCode.INTERNAL_SERVER_ERROR;
