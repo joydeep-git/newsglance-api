@@ -14,7 +14,7 @@ export type UserDataType = {
   audioBalance: number;
   isPremium: boolean;
   planExpiryDate: Date | null;
-  defaultCountry: string | null;
+  defaultCountry: string;
   createdAt: Date;
   updatedAt: Date;
 }
