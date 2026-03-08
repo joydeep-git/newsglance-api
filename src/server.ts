@@ -10,18 +10,23 @@ import errorMiddleware from "@/error-handlers/error-middleware";
 import routeErrorHandler from "@/middleware/route-error-handler";
 import { responseWrapper } from "@/middleware/response-wrapper";
 
-import authRouters from "@/routers/auth-router";
+
+import paymentService from "@/services/payment-service/payment-service";
+
+import authRouters from "@/routers/auth-routers";
 import userRouters from "@/routers/user-routers";
 import newsRouters from "@/routers/news-routers";
 import utilityRouters from "@/routers/utility-routers";
+import paymentRouters from "@/routers/payment-routers";
 
-import prismaSeeding from "./prisma-utils/prismaSeeding";
+import prismaSeeding from "@/prisma-utils/prisma-seeding";
 
 // Redis
 import redisService from "@/services/redis-service/redis-service";
 
 // AWS services
 import cloudStorage from "@/services/aws-service/s3";
+
 
 
 
@@ -33,37 +38,21 @@ class Server {
 
   constructor() {
 
-    dotenv.config();
-
-    this.app = express();
-
-    this.port = Number(process.env.PORT);
-
-    void redisService;
-
-    void cloudStorage;
-
-    this.runServer();
-
-  }
-
-
-  // running all methods
-
-  private runServer() {
-
     try {
-      this.securityConfig();
 
-      this.middlewareConfig();
+      dotenv.config();
 
-      this.createRoutes();
+      this.app = express();
 
-      this.errorMiddlewareConfig();
+      this.port = Number(process.env.PORT || 5000);
 
-      this.startServer();
+      void redisService;
 
-      void prismaSeeding().catch(err => console.log("Prisma Seeding ERROR:", err));
+      void cloudStorage;
+
+      void paymentService;
+
+      this.runServer();
 
     } catch (err) {
 
@@ -72,6 +61,25 @@ class Server {
       process.exit(1);
 
     }
+
+  }
+
+
+  // running all methods
+
+  private runServer() {
+
+    this.securityConfig();
+
+    this.middlewareConfig();
+
+    this.createRoutes();
+
+    this.errorMiddlewareConfig();
+
+    this.startServer();
+
+    void prismaSeeding().catch(err => console.log("Prisma Seeding ERROR:", err));
 
   }
 
@@ -116,6 +124,7 @@ class Server {
     this.app.use("/api/auth", authRouters);
     this.app.use("/api/user", userRouters);
     this.app.use("/api/news", newsRouters);
+    this.app.use("/api/payment", paymentRouters);
     this.app.use("/api", utilityRouters);
 
   }
