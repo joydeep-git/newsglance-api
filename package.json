@@ -21,9 +21,9 @@
     "docker:up": "docker compose up -d",
     "docker:down": "docker compose down -v",
     "docker:logs": "docker compose logs -f | cat",
-    "prisma:g": "prisma generate",
-    "prisma:m": "prisma migrate dev --name init",
-    "prisma:s": "prisma studio"
+    "db:g": "pnpm dlx prisma generate",
+    "db:m": "pnpm dlx prisma migrate dev",
+    "db:s": "pnpm prisma studio"
   },
   "devDependencies": {
     "@types/cookie-parser": "^1.4.8",
