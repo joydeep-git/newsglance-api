@@ -2,9 +2,9 @@ import ErrorHandler from "@/error-handlers/error-handler";
 import prismaErrorHandler from "@/error-handlers/prisma-error-handler";
 import { StatusCode } from "@/types";
 import redisErrorHandler from "@/error-handlers/redis-error-handler";
-import { Prisma } from "@prisma/client";
 import awsErrorHandler from "@/error-handlers/aws-error-handler";
 import cashfreeErrorHandler from "@/error-handlers/cashfree-error-handler";
+import { Prisma } from "@/generated/prisma/client";
 
 export const errRes = (message: string, status: number): ErrorHandler => {
   return new ErrorHandler({ message, status });
