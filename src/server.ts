@@ -10,9 +10,6 @@ import errorMiddleware from "@/error-handlers/error-middleware";
 import routeErrorHandler from "@/middleware/route-error-handler";
 import { responseWrapper } from "@/middleware/response-wrapper";
 
-
-import paymentService from "@/services/payment-service/payment-service";
-
 import authRouters from "@/routers/auth-routers";
 import userRouters from "@/routers/user-routers";
 import newsRouters from "@/routers/news-routers";
@@ -20,13 +17,6 @@ import utilityRouters from "@/routers/utility-routers";
 import paymentRouters from "@/routers/payment-routers";
 
 import prismaSeeding from "@/prisma-utils/prisma-seeding";
-
-// Redis
-import redisService from "@/services/redis-service/redis-service";
-
-// AWS services
-import cloudStorage from "@/services/aws-service/s3";
-
 
 
 
@@ -38,29 +28,15 @@ class Server {
 
   constructor() {
 
-    try {
+    dotenv.config();
 
-      dotenv.config();
+    this.app = express();
 
-      this.app = express();
+    this.port = Number(process.env.PORT || 5000);
 
-      this.port = Number(process.env.PORT || 5000);
+    this.runServer();
 
-      void redisService;
-
-      void cloudStorage;
-
-      void paymentService;
-
-      this.runServer();
-
-    } catch (err) {
-
-      console.log("Server.ts RUN SERVER ERROR:", err);
-
-      process.exit(1);
-
-    }
+    this.startServer();
 
   }
 
@@ -69,17 +45,26 @@ class Server {
 
   private runServer() {
 
-    this.securityConfig();
+    try {
 
-    this.middlewareConfig();
+      this.securityConfig();
 
-    this.createRoutes();
+      this.middlewareConfig();
 
-    this.errorMiddlewareConfig();
+      this.createRoutes();
 
-    this.startServer();
+      this.errorMiddlewareConfig();
 
-    void prismaSeeding().catch(err => console.log("Prisma Seeding ERROR:", err));
+      // create default image file on pg table
+      void prismaSeeding().catch(() => process.exit(1));
+
+    } catch (err) {
+
+      console.log("Server Init Failed:", err);
+
+      process.exit(1);
+
+    }
 
   }
 
