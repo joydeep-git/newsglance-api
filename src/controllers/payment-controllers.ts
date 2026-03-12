@@ -1,4 +1,4 @@
-import { errorPrinter, errRes, errRouter } from "@/error-handlers/error-responder";
+import { errorPrinter, errRes, errRouter } from "@/errors/error-responder";
 import paymentQueries from "@/prisma-utils/payment-queries";
 import paymentService from "@/services/payment-service/payment-service";
 import authRedis from "@/services/redis-service/auth-redis";
@@ -12,7 +12,7 @@ class PaymentControllers {
 
     try {
 
-      if(!req.user.isPremium) {
+      if (!req.user.isPremium) {
         return next(errRes("You already have premium membership!", StatusCode.FORBIDDEN));
       }
 

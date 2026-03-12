@@ -2,7 +2,7 @@ import argon2 from 'argon2';
 import db from "@/prisma-utils/db-client"
 import { UserDataType } from '@/types/auth-types';
 import { Request } from 'express';
-import { errRouter } from '@/error-handlers/error-responder';
+import { errRouter } from '@/errors/error-responder';
 
 
 const authQueries = {

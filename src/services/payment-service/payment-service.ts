@@ -1,5 +1,5 @@
 
-import { errorPrinter, errRes } from "@/error-handlers/error-responder";
+import { errorPrinter, errRes } from "@/errors/error-responder";
 import { StatusCode } from "@/types";
 import { PaymentStatusType } from "@/types/payment-types";
 import { UserDataType } from "@/types/auth-types";

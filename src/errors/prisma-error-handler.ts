@@ -1,6 +1,6 @@
-import ErrorHandler from "@/error-handlers/error-handler";
+import ErrorHandler from "@/errors/error-handler";
 import { StatusCode } from "@/types";
-import { errorPrinter } from "@/error-handlers/error-responder";
+import { errorPrinter } from "@/errors/error-responder";
 import { Prisma } from "@/generated/prisma/client";
 
 

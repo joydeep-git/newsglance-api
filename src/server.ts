@@ -6,7 +6,7 @@ import cookieParser from "cookie-parser";
 import rateLimit from "express-rate-limit";
 import cors from "cors";
 
-import errorMiddleware from "@/error-handlers/error-middleware";
+import errorMiddleware from "@/errors/error-middleware";
 import routeErrorHandler from "@/middleware/route-error-handler";
 import { responseWrapper } from "@/middleware/response-wrapper";
 

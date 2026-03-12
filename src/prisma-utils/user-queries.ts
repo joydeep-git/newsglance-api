@@ -1,4 +1,4 @@
-import { errRouter } from "@/error-handlers/error-responder";
+import { errRouter } from "@/errors/error-responder";
 import { UserDataType } from "@/types/auth-types";
 import db from "@/prisma-utils/db-client";
 import authRedis from "@/services/redis-service/auth-redis";

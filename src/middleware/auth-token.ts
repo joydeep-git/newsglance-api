@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import { StatusCode, TokenCreateResponseType } from "@/types/index";
-import { errRes, errRouter } from "@/error-handlers/error-responder";
+import { errRes, errRouter } from "@/errors/error-responder";
 import authRedis from "@/services/redis-service/auth-redis";
 import { UserDataType } from "@/types/auth-types";
 import authQueries from "@/prisma-utils/auth-queries";
@@ -31,7 +31,6 @@ class AuthToken {
 
     try {
       
-
       // getting TOKEN from headers
       const token: string = req.cookies.token || req.headers.cookie?.split("=")[1] || req.headers.authorization?.split(" ")[1];
 

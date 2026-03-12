@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import { errRes } from "@/error-handlers/error-responder";
+import { errRes } from "@/errors/error-responder";
 import { StatusCode } from "@/types";
 
 

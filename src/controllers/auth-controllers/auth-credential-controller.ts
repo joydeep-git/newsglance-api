@@ -1,6 +1,6 @@
 import argon2 from "argon2";
 import type { NextFunction, Request, Response } from "express";
-import { errRes, errRouter } from "@/error-handlers/error-responder";
+import { errRes, errRouter } from "@/errors/error-responder";
 import authToken from "@/middleware/auth-token";
 import authQueries from "@/prisma-utils/auth-queries";
 import authRedis from "@/services/redis-service/auth-redis";
@@ -32,7 +32,7 @@ class AuthCredentialControllers {
       if (existingUsername) return next(errRes("Username already exists!", StatusCode.CONFLICT));
 
 
-      
+
       // check email for account and validity
       if (!isValidEmail(email)) return next(errRes("Invalid Email!", StatusCode.BAD_REQUEST));
 

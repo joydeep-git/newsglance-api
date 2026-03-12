@@ -1,9 +1,11 @@
-import ErrorHandler from "@/error-handlers/error-handler";
-import { CashfreeError, StatusCode } from "@/types";
+import ErrorHandler from "@/errors/error-handler";
+import { StatusCode } from "@/types";
 import { errorPrinter } from "./error-responder";
+import { CashfreeErrorType } from "@/types/payment-types";
 
 
-const cashfreeErrorHandler = (err: CashfreeError): ErrorHandler => {
+
+const cashfreeErrorHandler = (err: CashfreeErrorType): ErrorHandler => {
 
   errorPrinter("Cashfree Error", err);
 

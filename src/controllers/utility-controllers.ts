@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { StatusCode } from "@/types";
-import { errRes, errRouter } from "@/error-handlers/error-responder";
+import { errRes, errRouter } from "@/errors/error-responder";
 import { isValidEmail, otpGenerator } from '@/utils/helper-functions';
 import authQueries from '@/prisma-utils/auth-queries';
 import emailService from "@/services/email-service/brevo-email-service";
