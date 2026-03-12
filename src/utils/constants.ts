@@ -257,14 +257,16 @@ export const countryMap: Map<string, CountryMapType> = new Map([
 ]);
 
 
-export const newsCategories = {
+export const newsCategories: Record<string, string> = {
+  "Tech": "technology",
   "Business": "business",
   "Finance": "money",
-  "Health": "lifeandstyle",
+  "Sports": "sport",
+  "Entertainment": "culture",
   "Politics": "politics",
   "Fashion": "fashion",
   "Travel": "travel",
-  "Entertainment": "culture",
-  "Sports": "sport",
-  "Tech": "technology",
 };
+
+
+export const validSections = Object.values(newsCategories);
