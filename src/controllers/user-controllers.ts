@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import { errorPrinter, errRes, errRouter } from "@/error-handlers/error-responder";
+import { errorPrinter, errRes, errRouter } from "@/errors/error-responder";
 import { StatusCode } from "@/types/index";
 import userQueries from "@/prisma-utils/user-queries";
 import cloudStorage from "@/services/aws-service/s3";
@@ -15,7 +15,7 @@ class UserControllers {
 
       const updates: Record<string, string> = {};
 
-      const validFields = ["username", "name", "defaultCountry"];
+      const validFields = ["username", "name", "defaultCountry", "phoneNumber"];
 
       for (const key of validFields) {
         if (req.body[key]) updates[key] = req.body[key];

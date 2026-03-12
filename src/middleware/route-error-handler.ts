@@ -1,6 +1,6 @@
 
 import { StatusCode } from "@/types";
-import ErrorHandler from "@/error-handlers/error-handler";
+import ErrorHandler from "@/errors/error-handler";
 
 
 const routeErrorHandler = () => {

@@ -8,6 +8,8 @@ export const shortForm: Record<string, string> = {
   email: "Email",
   password: "Password",
   otp: "OTP",
+  phoneNumber: "Phone Number",
+  defaultCountry: "Default Country",
 };
 
 

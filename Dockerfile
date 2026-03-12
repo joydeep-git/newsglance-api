@@ -1,64 +1,31 @@
-FROM node:22-slim AS builder
-
+# Stage 1: Base
+FROM node:22-slim AS base
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
+RUN corepack enable
 WORKDIR /app
 
-# Install build dependencies
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    python3 \
-    make \
-    g++ \
-    pkg-config \
-    libssl-dev \
-  && rm -rf /var/lib/apt/lists/*
+# Stage 2: Dependencies
+FROM base AS deps
+COPY pnpm-lock.yaml package.json ./
+# Uses frozen-lockfile to ensure production consistency (pnpm's npm ci)
+RUN pnpm install --frozen-lockfile
 
-# Copy package files
-COPY package*.json ./
-
-# Install dependencies
-RUN npm ci
-
-# Copy source and schema
+# Stage 3: Builder
+FROM base AS builder
+COPY --from=deps /app/node_modules ./node_modules
 COPY . .
+RUN pnpm prisma generate
+RUN pnpm build
 
-# Generate Prisma Client
-RUN npx prisma generate
-
-# Build application
-RUN npm run build
-
-# Production stage
-FROM node:22-slim AS runner
-
-WORKDIR /app
-
-# Set environment variables
+# Stage 4: Runner
+FROM base AS runner
 ENV NODE_ENV=production
-ENV HOST=0.0.0.0
-ENV PORT=5000
-
-# Copy package files
-COPY package*.json ./
-
-# Install production dependencies only
-RUN npm ci --omit=dev && npm cache clean --force
-
-# Copy Prisma schema and migrations
-COPY prisma ./prisma
-
-# Copy compiled code and Prisma client from builder
+# Copy only necessary production files
 COPY --from=builder /app/dist ./dist
-COPY --from=builder /app/node_modules/.prisma /app/node_modules/.prisma
-COPY --from=builder /app/node_modules/@prisma /app/node_modules/@prisma
-
-# Create non-root user
-RUN useradd --system --create-home --home-dir /home/appuser appuser && \
-    chown -R appuser:appuser /app
-
-USER appuser
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/package.json ./package.json
+COPY --from=builder /app/prisma ./prisma
 
 EXPOSE 5000
-
-HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-  CMD node -e "require('http').get('http://localhost:5000/api/health', (r) => {if (r.statusCode !== 200) throw new Error(r.statusCode)})"
-
 CMD ["node", "dist/server.js"]

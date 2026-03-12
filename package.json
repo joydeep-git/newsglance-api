@@ -21,9 +21,9 @@
     "docker:up": "docker compose up -d",
     "docker:down": "docker compose down -v",
     "docker:logs": "docker compose logs -f | cat",
-    "prisma:g": "prisma generate",
-    "prisma:m": "prisma migrate dev --name init",
-    "prisma:s": "prisma studio"
+    "db:g": "pnpm dlx prisma generate",
+    "db:m": "pnpm dlx prisma migrate dev",
+    "db:s": "pnpm prisma studio"
   },
   "devDependencies": {
     "@types/cookie-parser": "^1.4.8",
@@ -33,22 +33,22 @@
     "@types/node": "^22.19.12",
     "@types/nodemailer": "^7.0.0",
     "@types/pg": "^8.16.0",
-    "prisma": "^7.4.1",
+    "prisma": "^7.4.2",
     "tsx": "^4.21.0",
     "typescript": "^5.9.3"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.873.0",
     "@prisma/adapter-pg": "^7.4.1",
-    "@prisma/client": "^7.4.1",
+    "@prisma/client": "^7.4.2",
     "@prisma/extension-accelerate": "^3.0.1",
     "@types/multer": "^2.0.0",
     "@types/npm": "^7.19.3",
     "argon2": "^0.44.0",
     "axios": "^1.12.2",
+    "cashfree-pg": "^5.1.0",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
-    "dodopayments": "^2.16.0",
     "dotenv": "^16.6.1",
     "express": "^4.19.2",
     "express-rate-limit": "^8.0.1",

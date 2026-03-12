@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { StatusCode } from "@/types/index";
-import { errorPrinter, errRes, errRouter } from "@/error-handlers/error-responder";
+import { errorPrinter, errRes, errRouter } from "@/errors/error-responder";
 import { isValidEmail } from "@/utils/helper-functions";
 import * as argon2 from "argon2";
 import authQueries from "@/prisma-utils/auth-queries";
@@ -104,7 +104,7 @@ class AuthGeneralControllers {
 
 
   // verify token
-  public async verifyToken(req: Request, res: Response ) {
+  public async verifyToken(req: Request, res: Response) {
 
     const user = req.user;
 

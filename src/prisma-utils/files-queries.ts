@@ -1,4 +1,4 @@
-import { errRouter } from "@/error-handlers/error-responder";
+import { errRouter } from "@/errors/error-responder";
 import { AudioFileType, ImageFileType } from "@/types/index";
 import db from "@/prisma-utils/db-client";
 

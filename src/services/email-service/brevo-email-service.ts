@@ -8,7 +8,7 @@ import deleteAccOtpTemplate from "@/templates/delete-acc-otp-template";
 import forgetPassOtpTemplate from "@/templates/forget-password-otp-template";
 
 
-class EmailVerificationService {
+class BrevoEmailService {
 
   private transporter: Transporter;
 
@@ -75,5 +75,5 @@ class EmailVerificationService {
 }
 
 
-const emailVerificationService = new EmailVerificationService();
-export default emailVerificationService;
+const emailService = new BrevoEmailService();
+export default emailService;

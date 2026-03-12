@@ -10,13 +10,14 @@ CREATE TABLE "User" (
     "name" TEXT NOT NULL,
     "username" TEXT NOT NULL,
     "email" TEXT NOT NULL,
+    "phoneNumber" TEXT NOT NULL,
     "password" TEXT NOT NULL,
     "isPremium" BOOLEAN NOT NULL DEFAULT false,
     "planExpiryDate" TIMESTAMP(3),
     "newsBalance" INTEGER NOT NULL DEFAULT 2,
     "audioBalance" INTEGER NOT NULL DEFAULT 2,
-    "defaultCountry" TEXT NOT NULL DEFAULT 'IN',
-    "avatarId" TEXT NOT NULL DEFAULT 'cmlz9siht0000dn3hsd1zlpsp',
+    "defaultCountry" TEXT NOT NULL,
+    "avatarId" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
@@ -39,13 +40,13 @@ CREATE TABLE "File" (
 -- CreateTable
 CREATE TABLE "Payment" (
     "id" TEXT NOT NULL,
-    "stripeId" TEXT,
+    "transactionId" TEXT,
     "userId" TEXT NOT NULL,
     "amount" DOUBLE PRECISION NOT NULL,
     "currency" TEXT NOT NULL DEFAULT 'INR',
     "status" "PaymentStatus" NOT NULL,
-    "provider" TEXT NOT NULL DEFAULT 'dodopay',
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "Payment_pkey" PRIMARY KEY ("id")
 );
@@ -78,13 +79,16 @@ CREATE UNIQUE INDEX "User_username_key" ON "User"("username");
 CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "User_phoneNumber_key" ON "User"("phoneNumber");
+
+-- CreateIndex
 CREATE INDEX "User_avatarId_idx" ON "User"("avatarId");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "File_url_key" ON "File"("url");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "Payment_stripeId_key" ON "Payment"("stripeId");
+CREATE UNIQUE INDEX "Payment_transactionId_key" ON "Payment"("transactionId");
 
 -- CreateIndex
 CREATE INDEX "Payment_userId_idx" ON "Payment"("userId");
@@ -102,7 +106,7 @@ CREATE INDEX "Comment_userId_idx" ON "Comment"("userId");
 CREATE INDEX "Comment_newsId_idx" ON "Comment"("newsId");
 
 -- AddForeignKey
-ALTER TABLE "User" ADD CONSTRAINT "User_avatarId_fkey" FOREIGN KEY ("avatarId") REFERENCES "File"("id") ON DELETE SET DEFAULT ON UPDATE CASCADE;
+ALTER TABLE "User" ADD CONSTRAINT "User_avatarId_fkey" FOREIGN KEY ("avatarId") REFERENCES "File"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Payment" ADD CONSTRAINT "Payment_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;

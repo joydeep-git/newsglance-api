@@ -6,22 +6,17 @@ import cookieParser from "cookie-parser";
 import rateLimit from "express-rate-limit";
 import cors from "cors";
 
-import errorMiddleware from "@/error-handlers/error-middleware";
+import errorMiddleware from "@/errors/error-middleware";
 import routeErrorHandler from "@/middleware/route-error-handler";
 import { responseWrapper } from "@/middleware/response-wrapper";
 
-import authRouters from "@/routers/auth-router";
+import authRouters from "@/routers/auth-routers";
 import userRouters from "@/routers/user-routers";
 import newsRouters from "@/routers/news-routers";
 import utilityRouters from "@/routers/utility-routers";
+import paymentRouters from "@/routers/payment-routers";
 
-import prismaSeeding from "./prisma-utils/prismaSeeding";
-
-// Redis
-import redisService from "@/services/redis-service/redis-service";
-
-// AWS services
-import cloudStorage from "@/services/aws-service/s3";
+import prismaSeeding from "@/prisma-utils/prisma-seeding";
 
 
 
@@ -37,13 +32,11 @@ class Server {
 
     this.app = express();
 
-    this.port = Number(process.env.PORT);
-
-    void redisService;
-
-    void cloudStorage;
+    this.port = Number(process.env.PORT || 5000);
 
     this.runServer();
+
+    this.startServer();
 
   }
 
@@ -53,6 +46,7 @@ class Server {
   private runServer() {
 
     try {
+
       this.securityConfig();
 
       this.middlewareConfig();
@@ -61,13 +55,12 @@ class Server {
 
       this.errorMiddlewareConfig();
 
-      this.startServer();
-
-      void prismaSeeding().catch(err => console.log("Prisma Seeding ERROR:", err));
+      // create default image file on pg table
+      void prismaSeeding().catch(() => process.exit(1));
 
     } catch (err) {
 
-      console.log("Server.ts RUN SERVER ERROR:", err);
+      console.log("Server Init Failed:", err);
 
       process.exit(1);
 
@@ -116,6 +109,7 @@ class Server {
     this.app.use("/api/auth", authRouters);
     this.app.use("/api/user", userRouters);
     this.app.use("/api/news", newsRouters);
+    this.app.use("/api/payment", paymentRouters);
     this.app.use("/api", utilityRouters);
 
   }

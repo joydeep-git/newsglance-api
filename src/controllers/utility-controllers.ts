@@ -1,9 +1,9 @@
 import { NextFunction, Request, Response } from "express";
 import { StatusCode } from "@/types";
-import { errRes, errRouter } from "@/error-handlers/error-responder";
+import { errRes, errRouter } from "@/errors/error-responder";
 import { isValidEmail, otpGenerator } from '@/utils/helper-functions';
 import authQueries from '@/prisma-utils/auth-queries';
-import emailVerificationService from "@/services/email-service/email-service";
+import emailService from "@/services/email-service/brevo-email-service";
 import authRedis from "@/services/redis-service/auth-redis";
 import userQueries from "@/prisma-utils/user-queries";
 
@@ -56,7 +56,7 @@ class UtilityControllers {
 
 
       // sending OTP
-      const emailResponse = await emailVerificationService.sendOtp({ email, otp, type });
+      const emailResponse = await emailService.sendOtp({ email, otp, type });
 
 
 

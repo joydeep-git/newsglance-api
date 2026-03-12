@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import { errRes, errRouter } from "@/error-handlers/error-responder";
+import { errRes, errRouter } from "@/errors/error-responder";
 import { OAuth2Client, TokenPayload } from "google-auth-library";
 import { StatusCode } from "@/types";
 import authQueries from "@/prisma-utils/auth-queries";
@@ -56,6 +56,8 @@ class AuthGoogleController {
             name: payload.name,
             password: randomPasswordGenerator(),
             avatarId: await authRedis.getDefaultAvatarId(),
+            defaultCountry: "IN",
+            phoneNumber: "9876543210",
           }
 
           req.body = body;
