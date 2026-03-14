@@ -13,7 +13,7 @@ export type CreatePaymentRecordType = {
 }
 
 
-export type CashfreeError = {
+export type CashfreeErrorType = {
   code?: string;
   message?: string;
   type?: string;

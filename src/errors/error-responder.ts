@@ -126,6 +126,8 @@ export const errorPrinter = (type: string, err: unknown) => {
 
   if (isDev) {
     console.log(`[${type}]`, JSON.stringify(err));
+  } else {
+    console.log(type);
   }
 
 }
