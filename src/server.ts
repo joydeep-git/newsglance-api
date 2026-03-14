@@ -43,7 +43,7 @@ class Server {
 
   // running all methods
 
-  private runServer() {
+  private async runServer() {
 
     try {
 
@@ -56,7 +56,7 @@ class Server {
       this.errorMiddlewareConfig();
 
       // create default image file on pg table
-      void prismaSeeding().catch(() => process.exit(1));
+      await prismaSeeding();
 
     } catch (err) {
 
