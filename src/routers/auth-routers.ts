@@ -1,8 +1,8 @@
 
 import express, { Router } from "express";
-import authControllers from "@/controllers/auth-controllers/auth-credential-controller";
-import authGoogleController from "@/controllers/auth-controllers/auth-google-controller";
-import authGeneralControllers from "@/controllers/auth-controllers/auth-general-controller";
+import authControllers from "@/controllers/auth-controllers/auth-credential";
+import authGoogleController from "@/controllers/auth-controllers/auth-google";
+import authGeneralControllers from "@/controllers/auth-controllers/auth-general";
 import authToken from "@/middleware/auth-token";
 
 

@@ -3,9 +3,9 @@ import { errRes, errRouter } from "@/errors/error-responder";
 import { OAuth2Client, TokenPayload } from "google-auth-library";
 import { StatusCode } from "@/types";
 import authQueries from "@/prisma-utils/auth-queries";
-import { randomPasswordGenerator, randomUsernameGenerator } from "@/utils/helper-functions";
+import { randomPasswordGenerator, randomUsernameGenerator } from "@/utils/helpers";
 import authToken from "@/middleware/auth-token";
-import authRedis from "@/services/redis-service/auth-redis";
+import authRedis from "@/services/redis/auth-redis";
 
 
 

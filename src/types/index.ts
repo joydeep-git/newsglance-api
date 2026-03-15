@@ -77,3 +77,11 @@ export type CountryMapType = {
   currency: string;
   flag: string;
 }
+
+
+export type FuelPriceResponseType = {
+  "city": string,
+  "price": string,
+  "change": string
+}
+

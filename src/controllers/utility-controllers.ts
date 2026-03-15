@@ -1,10 +1,10 @@
 import { NextFunction, Request, Response } from "express";
 import { StatusCode } from "@/types";
 import { errRes, errRouter } from "@/errors/error-responder";
-import { isValidEmail, otpGenerator } from '@/utils/helper-functions';
+import { isValidEmail, otpGenerator } from '@/utils/helpers';
 import authQueries from '@/prisma-utils/auth-queries';
-import emailService from "@/services/email-service/brevo-email-service";
-import authRedis from "@/services/redis-service/auth-redis";
+import emailService from "@/services/email/brevo";
+import authRedis from "@/services/redis/auth-redis";
 import userQueries from "@/prisma-utils/user-queries";
 
 

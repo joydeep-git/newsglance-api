@@ -3,10 +3,10 @@ import type { NextFunction, Request, Response } from "express";
 import { errRes, errRouter } from "@/errors/error-responder";
 import authToken from "@/middleware/auth-token";
 import authQueries from "@/prisma-utils/auth-queries";
-import authRedis from "@/services/redis-service/auth-redis";
+import authRedis from "@/services/redis/auth-redis";
 import { StatusCode } from "@/types/index";
-import type { UserDataType } from "@/types/auth-types";
-import { fieldValidator, isValidEmail } from "@/utils/helper-functions";
+import type { UserDataType } from "@/types/auth";
+import { fieldValidator, isValidEmail } from "@/utils/helpers";
 
 
 class AuthCredentialControllers {

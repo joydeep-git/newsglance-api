@@ -1,6 +1,6 @@
 import nodemailer, { Transporter } from "nodemailer";
 import { EmailSendResponse } from "@/types";
-import { OtpType } from "@/types/auth-types";
+import { OtpType } from "@/types/auth";
 import registationOtpTemplate from "@/templates/register-otp-template";
 import generalOtpTemplate from "@/templates/general-otp-template";
 import loginOtpTemplate from "@/templates/login-otp-template";

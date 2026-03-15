@@ -1,7 +1,7 @@
 import { errorPrinter, errRes, errRouter } from "@/errors/error-responder";
 import paymentQueries from "@/prisma-utils/payment-queries";
-import paymentService from "@/services/payment-service/payment-service";
-import authRedis from "@/services/redis-service/auth-redis";
+import cashfree from "@/services/payment/cashfree";
+import authRedis from "@/services/redis/auth-redis";
 import { StatusCode } from "@/types";
 import { NextFunction, Request, Response } from "express";
 
@@ -16,7 +16,7 @@ class PaymentControllers {
         return next(errRes("You already have premium membership!", StatusCode.FORBIDDEN));
       }
 
-      const product = await paymentService.createOrder({ user: req.user });
+      const product = await cashfree.createOrder({ user: req.user });
 
       if (!product) return next(errRes("Error creating product!", StatusCode.SERVICE_UNAVAILABLE));
 
@@ -50,7 +50,7 @@ class PaymentControllers {
 
       if (!orderId) return next(errRes("Order ID is required!", StatusCode.BAD_REQUEST));
 
-      const status = await paymentService.verifyPayment(orderId as string);
+      const status = await cashfree.verifyPayment(orderId as string);
 
       // update payment record
       const { payment, user } = await paymentQueries.updatePaymentStatus({ orderId, status: status });
