@@ -86,11 +86,13 @@ export type ArticleDetail = ArticleCard & {
 export type NewsResponse = {
   data: ArticleCard[];
   currentPage: number;
-  totalPages: number;
+  hasNextPage: boolean;
 };
 
 
 export type HomeResponse = {
+  currentPage: number;
+  hasNextPage: boolean;
   featured: ArticleCard[];
   finance: ArticleCard[];
   tech: ArticleCard[];
