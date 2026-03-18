@@ -21,6 +21,7 @@
     "docker:up": "docker compose up -d",
     "docker:down": "docker compose down -v",
     "docker:logs": "docker compose logs -f | cat",
+    "docker:dev": "docker compose -f docker-compose.dev.yml up --build",
     "db:g": "pnpm dlx prisma generate",
     "db:m": "pnpm dlx prisma migrate dev",
     "db:s": "pnpm prisma studio"
