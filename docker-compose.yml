@@ -22,3 +22,31 @@ services:
       interval: 30s
       timeout: 3s
       retries: 3
+
+
+
+
+# version: "3.8"
+
+# services:
+#   app:
+#     build: .
+#     container_name: newsglance-api
+#     ports:
+#       - "5000:5000"
+#     environment:
+#       NODE_ENV: production
+#       DATABASE_URL: ${DATABASE_URL}
+#       # IMPORTANT: Use the service name 'redis-cache' instead of 'localhost'
+#       REDIS_URL: redis://altonix:123456@redis-cache:6379
+#     depends_on:
+#       - redis-cache
+#     restart: unless-stopped
+
+#   redis-cache:
+#     image: redis:7-alpine
+#     container_name: newsglance-redis
+#     # We expose the port so you can still use your VS Code extension
+#     ports:
+#       - "48921:6379"
+#     command: ["redis-server", "--user", "altonix", "on", ">123456", "~*", "+@all"]

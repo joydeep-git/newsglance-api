@@ -1,0 +1,32 @@
+version: "3.8"
+
+services:
+  app:
+    build: 
+      context: .
+      target: deps # STOP at Stage 2! Don't build the 'dist' folder.
+    container_name: newsglance-api-dev
+    ports:
+      - "5000:5000"
+    environment:
+      NODE_ENV: development
+      DATABASE_URL: ${DATABASE_URL}
+      REDIS_URL: redis://altonix:123456@redis-cache:6379
+    
+    # THE MAGIC HAPPENS HERE:
+    volumes:
+      - ./:/app # The Wormhole: Syncs your local folder to the container's /app folder in real-time.
+      - /app/node_modules # The Shield: Prevents your Mac/Windows node_modules from overwriting the Linux ones.
+    
+    # Override the production start command with your hot-reload script
+    command: pnpm run dev 
+    
+    depends_on:
+      - redis-cache
+
+  redis-cache:
+    image: redis:7-alpine
+    container_name: newsglance-redis-dev
+    ports:
+      - "48921:6379"
+    command: ["redis-server", "--user", "altonix", "on", ">123456", "~*", "+@all"]
