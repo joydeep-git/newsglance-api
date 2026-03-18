@@ -9,29 +9,64 @@ import newsRedis from "@/services/redis/news-redis";
 class NewsControllers {
 
 
-  public async homePageNews(_: Request, res: Response, next: NextFunction) {
+  public async homePageNews(req: Request, res: Response, next: NextFunction) {
 
     try {
 
-      const cachedNews = await newsRedis.getHomePageNews();
+      const page = parseInt(String(req.query.page ?? "1"));
+
+      const cachedNews = await newsRedis.getHomePageNews(page);
 
       if (cachedNews) {
-
         return res.status(StatusCode.OK).json({
-          message: "Homescreen News fetched!",
+          message: "Homescreen news fetched from cache!",
           data: cachedNews
         })
-
       }
 
-      const news = await guardianNews.getHomeFeed();
+      const news = await guardianNews.getHomeFeed(page);
 
       // set to redis
-      await newsRedis.setHomePageNews(news);
+      await newsRedis.setHomePageNews(news, page);
 
       return res.status(200).json({
-        message: "Homescreen News fetched!",
+        message: "Homescreen News fetched from api!",
         data: news,
+      })
+
+    } catch (err) {
+      return next(errRouter(err));
+    }
+
+  }
+
+
+  public async getNewsById(req: Request, res: Response, next: NextFunction) {
+
+    try {
+
+      const { newsId } = req.params;
+
+      if (!newsId) return next(errRes("NewsId is required!", StatusCode.BAD_REQUEST));
+
+
+      // fetch from redis
+      const cachedNews = await newsRedis.getSingleNews(newsId);
+
+      if (cachedNews) {
+        return res.status(StatusCode.OK).json({
+          message: "News fetched!",
+          data: cachedNews,
+        })
+      }
+
+      const data = await guardianNews.getArticleById(newsId);
+
+      await newsRedis.setSingleNews(data);
+
+      return res.status(StatusCode.OK).json({
+        message: "News fetched!",
+        data,
       })
 
     } catch (err) {
@@ -47,9 +82,11 @@ class NewsControllers {
 
       const { category } = req.params;
 
+      const page = parseInt(String(req.query.page ?? "1"));
+
       if (!category) return next(errRes("Category is required!", StatusCode.BAD_REQUEST));
 
-      const cachedNews = await newsRedis.getCategoryNews(category);
+      const cachedNews = await newsRedis.getCategoryNews(category, page);
 
       if (cachedNews) {
         return res.status(StatusCode.OK).json({
@@ -58,9 +95,9 @@ class NewsControllers {
         });
       }
 
-      const data = await guardianNews.getByCategory(category);
+      const data = await guardianNews.getByCategory(category, page);
 
-      await newsRedis.setCategoryNews({ category, news: data });
+      await newsRedis.setCategoryNews({ category, news: data, page });
 
       return res.status(StatusCode.OK).json({
         message: `${category} news fetched!`,
@@ -80,9 +117,26 @@ class NewsControllers {
 
       const { country } = req.params;
 
+      const page = parseInt(String(req.query.page ?? "1"));
+
       if (!country) return next(errRes("Country is required!", StatusCode.BAD_REQUEST));
 
-      const news = await guardianNews.getByCountry(country);
+      const cachedNews = await newsRedis.getCountryNews(country, page);
+
+      if (cachedNews) {
+        return res.status(StatusCode.OK).json({
+          message: `${country} news fetched!`,
+          data: cachedNews,
+        });
+      }
+
+      const news = await guardianNews.getByCountry(country, page);
+
+      return res.json({
+        news
+      })
+
+      await newsRedis.setCountryNews({ country, news, page });
 
       return res.status(200).json({
         message: `${country} news fetched!`,
@@ -100,11 +154,11 @@ class NewsControllers {
 
     try {
 
-      const { query } = req.params;
+      const { query, page } = req.query;
 
       if (!query) return next(errRes("No query!", StatusCode.BAD_REQUEST));
 
-      const data = await guardianNews.search(query);
+      const data = await guardianNews.search(String(query), Number(page?.toString() ?? "1"));
 
       return res.status(200).json({
         message: "News fetched for " + query,
@@ -132,6 +186,35 @@ class NewsControllers {
         message: "Saved!",
         data: bookmark,
       });
+
+    } catch (err) {
+      return next(errRouter(err));
+    }
+
+  }
+
+
+  public async getBookmark(req: Request, res: Response, next: NextFunction) {
+
+    try {
+
+      const bookmarkedNews = await newsDb.getBookmark(req.user.id);
+
+      if (bookmarkedNews.length === 0) {
+        return res.status(StatusCode.OK).json({
+          message: "Saved News fetched!",
+          data: []
+        })
+      }
+
+      const allBookmarks = bookmarkedNews.map(bookmark => bookmark.newsId);
+
+      const news = await guardianNews.getByIds(allBookmarks);
+
+      return res.status(StatusCode.OK).json({
+        message: "Saved news fetched!",
+        data: news.data
+      })
 
     } catch (err) {
       return next(errRouter(err));

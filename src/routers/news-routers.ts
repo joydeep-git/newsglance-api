@@ -12,17 +12,19 @@ class NewsRouters {
 
     this.router.get("/homepage", newsController.homePageNews);
     
-    this.router.get("/:category", newsController.categoryNews);
+    this.router.get("/category/:category", newsController.categoryNews);
     
-    this.router.get("/:country", newsController.countrynews);
+    this.router.get("/country/:country(.*)", newsController.countrynews);
     
-    this.router.get("/:query", newsController.searchNews);
+    this.router.get("/search", newsController.searchNews);
 
-    this.router.get("/bookmark/:newsId", authToken.validator, newsController.addBookmark);
+    this.router.get("/single/:newsId(.*)", newsController.getNewsById);
+
+    this.router.post("/bookmark/:newsId", authToken.validator, newsController.addBookmark);
+
+    this.router.get("/bookmark", authToken.validator, newsController.getBookmark);
 
     this.router.delete("/bookmark/:newsId", authToken.validator, newsController.deleteBookmark);
-
-    this.router.patch("");
 
   }
 
