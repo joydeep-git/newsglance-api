@@ -1,13 +1,13 @@
 import axios from "axios";
-import { GuardianCardResponseType, GuardianSingleNewsResponse, GuardianArticle_Card, ArticleCard, ArticleDetail, NewsResponse, HomeResponse, FetchOptions } from "@/types/news";
+import { GuardianCardResponseType, GuardianSingleNewsResponse, GuardianArticle_Card, ArticleCard, ArticleDetail, NewsResponse, HomeResponse } from "@/types/news";
 import { validSections } from "@/utils/constants";
 
 
 const HOME_FINANCE_SECTION = "money";
 const HOME_TECH_SECTION = "technology";
 const HOME_FEATURED_COUNT = 50;
-const HOME_FINANCE_COUNT = 7;
-const HOME_TECH_COUNT = 5;
+const HOME_FINANCE_COUNT = 5;
+const HOME_TECH_COUNT = 10;
 const WORDS_PER_MINUTE = 200;
 const PAGE_SIZE = 50; // MAX 200 limit
 
@@ -87,7 +87,7 @@ class GuardianNews {
       return {
         data: results.map((raw) => this.toCard(raw)),
         currentPage: currentPage,
-        totalPages: pages,
+        hasNextPage: currentPage < pages,
       };
 
     } catch (err) {
@@ -98,11 +98,11 @@ class GuardianNews {
 
 
   // Home feed — 3 requests
-  async getHomeFeed(): Promise<HomeResponse> {
+  async getHomeFeed(page: number): Promise<HomeResponse> {
 
     const [featuredResult, financeResult, techResult] = await Promise.allSettled([
 
-      this.fetchCards("/search", { "page-size": HOME_FEATURED_COUNT }),
+      this.fetchCards("/search", { "page-size": HOME_FEATURED_COUNT, page }),
 
       this.fetchCards(`/${HOME_FINANCE_SECTION}`, { "page-size": HOME_FINANCE_COUNT }),
 
@@ -110,6 +110,8 @@ class GuardianNews {
     ]);
 
     return {
+      currentPage: featuredResult.status === "fulfilled" ? featuredResult.value.currentPage : 1,
+      hasNextPage: featuredResult.status === "fulfilled" ? featuredResult.value.hasNextPage : false,
       featured: featuredResult.status === "fulfilled" ? featuredResult.value.data : [],
       finance: financeResult.status === "fulfilled" ? financeResult.value.data : [],
       tech: techResult.status === "fulfilled" ? techResult.value.data : [],
@@ -120,24 +122,23 @@ class GuardianNews {
 
 
   // Category wise
-  async getByCategory(category: string, opts: FetchOptions = {}): Promise<NewsResponse> {
+  async getByCategory(category: string, page: number): Promise<NewsResponse> {
     if (!validSections.includes(category)) {
       throw new Error(`Invalid category: "${category}". Must be one of: ${validSections.join(", ")}`);
     }
     return this.fetchCards(`/${category}`, {
-      page: opts.page ?? 1,
-      "page-size": opts.pageSize ?? PAGE_SIZE,
+      page: page,
+      "page-size": PAGE_SIZE,
     });
   }
 
 
 
   // Country wise
-  async getByCountry(countryTag: string, opts: FetchOptions = {}): Promise<NewsResponse> {
-    return this.fetchCards("/search", {
-      tag: countryTag,
-      page: opts.page ?? 1,
-      "page-size": opts.pageSize ?? PAGE_SIZE,
+  async getByCountry(countryTag: string, page: number): Promise<NewsResponse> {
+    return this.fetchCards(`/country/${countryTag}`, {
+      page: page,
+      "page-size": PAGE_SIZE,
     });
   }
 
@@ -183,7 +184,7 @@ class GuardianNews {
   // Bookmarks
   async getByIds(ids: string[]): Promise<NewsResponse> {
 
-    if (ids.length === 0) return { data: [], currentPage: 1, totalPages: 0 };
+    if (ids.length === 0) return { data: [], currentPage: 1, hasNextPage: false };
 
     return this.fetchCards("/search", {
       ids: ids.join(","),
@@ -195,11 +196,11 @@ class GuardianNews {
 
 
   // Search
-  async search(query: string, opts: FetchOptions = {}): Promise<NewsResponse> {
+  async search(query: string, page: number): Promise<NewsResponse> {
     return this.fetchCards("/search", {
       q: query,
-      page: opts.page ?? 1,
-      "page-size": opts.pageSize ?? PAGE_SIZE,
+      page: page,
+      "page-size": PAGE_SIZE,
     });
   }
 

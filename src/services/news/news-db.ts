@@ -22,6 +22,22 @@ class NewsDb {
 
   }
 
+  public async getBookmark(userId: string): Promise<BookmarkType[]> {
+
+    try {
+
+      return await db.bookmark.findMany({
+        where: {
+          userId,
+        }
+      });
+
+    } catch (err) {
+      throw err;
+    }
+
+  }
+
   public async deleteBookmark({ newsId, userId }: { newsId: string; userId: string; }): Promise<BookmarkType> {
 
     try {
