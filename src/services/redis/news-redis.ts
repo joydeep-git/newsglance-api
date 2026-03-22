@@ -1,12 +1,12 @@
-import redisService from "@/services/redis/redis";
-import { ArticleCard, HomeResponse, NewsResponse } from "@/types/news";
 import Redis from "ioredis";
+import redisService from "@/services/redis/redis";
+import { ArticleDetail, HomeResponse, NewsResponse } from "@/types/news";
 
 
 
 class NewsRedis {
 
-
+  
   private redis: Redis = redisService.redis;
 
   private timeOut = 3600;
@@ -15,12 +15,12 @@ class NewsRedis {
 
 
   // store single news
-  public async setSingleNews(news: ArticleCard) {
+  public async setSingleNews(news: ArticleDetail) {
     await this.redis.setex(`news:single:${news.id}`, this.singleNewsTimeOut, JSON.stringify(news));
   }
 
   // get single news
-  public async getSingleNews(newsId: string): Promise<ArticleCard | null> {
+  public async getSingleNews(newsId: string): Promise<ArticleDetail | null> {
     return JSON.parse(String(await this.redis.get(`news:single:${newsId}`))) ?? null;
   }
 

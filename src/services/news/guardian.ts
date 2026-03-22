@@ -1,6 +1,6 @@
 import axios from "axios";
 import { GuardianCardResponseType, GuardianSingleNewsResponse, GuardianArticle_Card, ArticleCard, ArticleDetail, NewsResponse, HomeResponse } from "@/types/news";
-import { validSections } from "@/utils/constants";
+import { validSections, guardianCountryTagMap } from "@/utils/constants";
 
 
 const HOME_FINANCE_SECTION = "money";
@@ -135,11 +135,23 @@ class GuardianNews {
 
 
   // Country wise
-  async getByCountry(countryTag: string, page: number): Promise<NewsResponse> {
-    return this.fetchCards(`/country/${countryTag}`, {
-      page: page,
-      "page-size": PAGE_SIZE,
-    });
+  async getByCountry(country: string, page: number): Promise<NewsResponse> {
+
+    const normalised = country.toLowerCase().trim();
+    const tag = guardianCountryTagMap[normalised];
+
+    // Dedicated section (us-news, uk-news, australia-news) → use as endpoint
+    if (tag && !tag.startsWith("world/")) {
+      return this.fetchCards(`/${tag}`, { page, "page-size": PAGE_SIZE });
+    }
+
+    // world/{slug} tag → use /search with tag filter
+    if (tag && tag.startsWith("world/")) {
+      return this.fetchCards(`/search`, { tag, page, "page-size": PAGE_SIZE });
+    }
+
+    // Fallback: keyword search for countries not in Guardian's tagging
+    return this.fetchCards(`/search`, { q: country, page, "page-size": PAGE_SIZE });
   }
 
 

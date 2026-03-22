@@ -4,6 +4,7 @@ import guardianNews from "@/services/news/guardian";
 import newsDb from "@/services/news/news-db";
 import { StatusCode } from "@/types";
 import newsRedis from "@/services/redis/news-redis";
+import gemini from "@/services/google/gemini";
 
 
 class NewsControllers {
@@ -132,16 +133,12 @@ class NewsControllers {
 
       const news = await guardianNews.getByCountry(country, page);
 
-      return res.json({
-        news
-      })
-
       await newsRedis.setCountryNews({ country, news, page });
 
       return res.status(200).json({
         message: `${country} news fetched!`,
         data: news,
-      })
+      });
 
     } catch (err) {
       return next(errRouter(err));
@@ -154,14 +151,14 @@ class NewsControllers {
 
     try {
 
-      const { query, page } = req.query;
+      const { q, page } = req.query;
 
-      if (!query) return next(errRes("No query!", StatusCode.BAD_REQUEST));
+      if (!q) return next(errRes("No q!", StatusCode.BAD_REQUEST));
 
-      const data = await guardianNews.search(String(query), Number(page?.toString() ?? "1"));
+      const data = await guardianNews.search(String(q), Number(page?.toString() ?? "1"));
 
       return res.status(200).json({
-        message: "News fetched for " + query,
+        message: "News fetched for " + q,
         data
       })
 
@@ -235,6 +232,39 @@ class NewsControllers {
 
       return res.status(StatusCode.OK).json({
         message: "Removed!",
+        data,
+      })
+
+    } catch (err) {
+      return next(errRouter(err));
+    }
+
+  }
+
+
+  public async summerizeNews(req: Request, res: Response, next: NextFunction) {
+
+    try {
+
+      const { newsId } = req.params;
+
+      if (!newsId) return next(errRes("NewsId not found!", StatusCode.BAD_REQUEST));
+
+      let news = await newsRedis.getSingleNews(newsId);
+
+      if(!news){
+        news = await guardianNews.getArticleById(newsId);
+        await newsRedis.setSingleNews(news);
+      }
+
+      const data = await gemini.summarizeNews(news.body);
+
+      if (!data) return next(errRes("Failed to generate summerization!", StatusCode.SERVICE_UNAVAILABLE));
+
+      await newsDb.setNewsdata({ newsId, type: "summery", value: data });
+
+      return res.status(200).json({
+        message: "Data fetched!",
         data,
       })
 

@@ -26,6 +26,8 @@ class NewsRouters {
 
     this.router.delete("/bookmark/:newsId", authToken.validator, newsController.deleteBookmark);
 
+    this.router.get("/summary/:newsId(.*)", newsController.summerizeNews);
+
   }
 
 }
