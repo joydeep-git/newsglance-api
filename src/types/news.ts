@@ -110,3 +110,19 @@ export type BookmarkType = {
   userId: string;
   createdAt: Date;
 }
+
+
+export type NewsDataPropsType = {
+  newsId: string;
+  type: "audio" | "summary";
+  value: string;
+}
+
+
+export type PollyAudioResultType = {
+  size: number;
+  originalname?: string;
+  filename?: string;
+  duration?: number;
+  url: string;
+};
