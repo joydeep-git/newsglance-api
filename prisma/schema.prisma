@@ -41,6 +41,7 @@ model File {
   url      String   @unique
   fileSize Float
   type     FileType
+  duration Float?
 
   isDefaultFile Boolean @default(false)
 
