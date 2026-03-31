@@ -60,6 +60,7 @@ export interface FileDataType{
   fileSize: number;
   createdAt: Date;
   isDefaultFile: boolean;
+  duration?: number | null;
 };
 
 

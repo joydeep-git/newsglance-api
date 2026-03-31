@@ -1,5 +1,5 @@
 import db from "@/prisma-utils/db-client";
-import { BookmarkType } from "@/types/news";
+import { BookmarkType, NewsDataPropsType } from "@/types/news";
 
 
 class NewsDb {
@@ -55,7 +55,7 @@ class NewsDb {
 
   }
 
-  public async setNewsdata({ newsId, type, value }: { newsId: string; type: "audio" | "summery"; value: string; }) {
+  public async setNewsdata({ newsId, type, value }: NewsDataPropsType) {
 
     try {
 
@@ -78,8 +78,11 @@ class NewsDb {
     try {
 
       return await db.newsData.findFirst({
-        where: { newsId }
-      })
+        where: { newsId },
+        include: {
+          audioFile: true,
+        }
+      });
 
     } catch (err) {
       throw err;

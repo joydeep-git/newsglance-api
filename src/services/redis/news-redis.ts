@@ -21,47 +21,67 @@ class NewsRedis {
 
   // get single news
   public async getSingleNews(newsId: string): Promise<ArticleDetail | null> {
-    return JSON.parse(String(await this.redis.get(`news:single:${newsId}`))) ?? null;
+
+    const res = await this.redis.get(`news:single:${newsId}`);
+
+    if (!res) return null;
+
+    return JSON.parse(res);
   }
 
 
 
-  // ######### HOME SCREEN NEWS
+  // home screen news SET
   public async setHomePageNews(news: HomeResponse, page: number) {
     await this.redis.setex(`news:homePage:page:${page}`, this.timeOut, JSON.stringify(news));
   }
 
-  // ######### HOME SCREEN NEWS GET
+  // home screen news GET
   public async getHomePageNews(page: number): Promise<HomeResponse | null> {
-    return JSON.parse(String(await this.redis.get(`news:homePage:page:${page}`))) ?? null;
+
+    const res = await this.redis.get(`news:homePage:page:${page}`);
+
+    if (!res) return null;
+
+    return JSON.parse(res);
   }
 
 
 
-  // ######### CATEGORY NEWS SET
+  // category news SET
   public async setCategoryNews({ category, news, page }: { news: NewsResponse; category: string; page: number; }) {
     await this.redis.setex(`news:category:${category}:page:${page}`, this.timeOut, JSON.stringify(news));
   }
 
 
 
-  // ######### CATEGORY NEWS GET
+  // category news GET
   public async getCategoryNews(category: string, page: number): Promise<NewsResponse | null> {
-    return JSON.parse(String(await this.redis.get(`news:category:${category}:page:${page}`))) ?? null;
+
+    const data = await this.redis.get(`news:category:${category}:page:${page}`);
+
+    if (!data) return null;
+    
+    return JSON.parse(data);
   }
 
 
 
-  // ######### COUNTRY NEWS SET
+  // country news SET
   public async setCountryNews({ country, news, page }: { news: NewsResponse; country: string; page: number; }) {
     await this.redis.setex(`news:country:${country}:page:${page}`, this.timeOut, JSON.stringify(news));
   }
 
 
 
-  // ######### COUNTRY NEWS GET
+  // country news GET
   public async getCountryNews(country: string, page: number): Promise<NewsResponse | null> {
-    return JSON.parse(String(await this.redis.get(`news:country:${country}:page:${page}`))) ?? null;
+    
+    const data = await this.redis.get(`news:country:${country}:page:${page}`);
+
+    if (!data) return null;
+
+    return JSON.parse(data);
   }
 
 }
