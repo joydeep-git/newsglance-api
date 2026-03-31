@@ -7,6 +7,10 @@ import redisErrorHandler from "@/errors/redis-error-handler";
 import awsErrorHandler from "@/errors/aws-error-handler";
 import cashfreeErrorHandler from "@/errors/cashfree-error-handler";
 import guardianErrorHandler from "@/errors/guardian-error-handler";
+import geminiErrorHandler from "./gemini-error-handler";
+import { S3ServiceException } from "@aws-sdk/client-s3";
+import { PollyServiceException } from "@aws-sdk/client-polly";
+import { BedrockRuntimeServiceException } from "@aws-sdk/client-bedrock-runtime";
 
 
 
@@ -19,34 +23,19 @@ export const errRes = (message: string, status: number): ErrorHandler => {
 export const errRouter = (err: unknown, fallbackMessage = "Internal Server Error"): ErrorHandler => {
 
 
-  if (err instanceof ErrorHandler) {
-    return err;
-  }
+  if (err instanceof ErrorHandler) return err;
 
+  if (isPrismaError(err)) return prismaErrorHandler(err);
 
-  if (isPrismaError(err)) {
-    return prismaErrorHandler(err);
-  }
+  if (isAWSError(err)) return awsErrorHandler(err);
 
+  if (isRedisError(err)) return redisErrorHandler(err);
 
-  if (isAWSError(err)) {
-    return awsErrorHandler(err);
-  }
+  if (isCashfreeError(err)) return cashfreeErrorHandler(err as any);
 
+  if (isGeminiError(err)) return geminiErrorHandler(err as any);
 
-  if (isRedisError(err)) {
-    return redisErrorHandler(err);
-  }
-
-
-  if (isCashfreeError(err)) {
-    return cashfreeErrorHandler(err as any);
-  }
-
-
-  if (isGuardianError(err)) {
-    return guardianErrorHandler(err as AxiosError);
-  }
+  if (isGuardianError(err)) return guardianErrorHandler(err as AxiosError);
 
 
   if (err instanceof Error) {
@@ -89,35 +78,58 @@ const isPrismaError = (err: unknown): boolean => {
 
 
 const isAWSError = (err: unknown): boolean => {
-  return !!(err && typeof err === 'object' && '$metadata' in err);
+  return (
+    err instanceof S3ServiceException ||
+    err instanceof PollyServiceException ||
+    err instanceof BedrockRuntimeServiceException
+  );
 };
 
 
 
 const isRedisError = (err: any): boolean => {
+
   if (err?.name === "RedisError" || err?.name === "ReplyError") return true;
+
   if (err instanceof Error && err.message.toLowerCase().includes("redis")) return true;
+
   return false;
 };
 
 
 const isCashfreeError = (err: unknown): boolean => {
-  return !!(
-    err &&
-    typeof err === "object" &&
-    ("code" in err || "type" in err) &&
-    "message" in err &&
-    // Cashfree errors typically have a `type` like "PAYMENT_ERROR" or a cf_ prefixed code
-    (String((err as any).type).includes("PAYMENT") ||
-      String((err as any).code).startsWith("cf_") ||
-      String((err as any).code) === (err as any).code?.toUpperCase())
-  );
+
+  if (!(err && typeof err === "object" && "message" in err)) return false;
+
+  // must have PAYMENT
+  if ("type" in err && String((err as any).type).includes("PAYMENT")) return true;
+
+  // must have cf_
+  if ("code" in err && String((err as any).code).startsWith("cf_")) return true;
+
+  return false;
 };
 
 
 const isGuardianError = (err: unknown): boolean => {
   return err instanceof AxiosError && !!err.response?.status;
 };
+
+
+
+const isGeminiError = (err: unknown): boolean => {
+
+  if (!(err && typeof err === "object")) return false;
+
+  const constructorName = String((err as any)?.constructor?.name).toLowerCase();
+  
+  if (constructorName.includes("google") || constructorName.includes("gemini")) return true;
+
+  if ("errorDetails" in err && Array.isArray((err as any).errorDetails)) return true;
+
+  return false;
+};
+
 
 
 export const errorPrinter = (type: string, err: unknown) => {

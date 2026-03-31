@@ -1,5 +1,5 @@
 
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import { StatusCode } from "@/types";
 import ErrorHandler from "@/errors/error-handler";
 
@@ -8,6 +8,7 @@ const errorMiddleware = (
   err: ErrorHandler | Error | any,
   _: Request,
   res: Response,
+  __: NextFunction,
 ) => {
 
   const statusCode = err instanceof ErrorHandler ? err.statusCode : StatusCode.INTERNAL_SERVER_ERROR;
