@@ -70,7 +70,6 @@ export type ArticleCard = {
   publishedAt: string;
   readTime: number;
   section: string;
-  sourceUrl: string;
 };
 
 
@@ -79,7 +78,6 @@ export type ArticleDetail = ArticleCard & {
   heroImage: string | null;
   publication: string;
   updatedAt: string | null;
-  shareUrl: string | null;
 };
 
 

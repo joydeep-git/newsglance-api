@@ -47,7 +47,6 @@ class GuardianNews {
       publishedAt: raw.webPublicationDate,
       readTime: Math.ceil(Number(raw.fields.wordcount ?? 0) / WORDS_PER_MINUTE),
       section: raw.sectionName,
-      sourceUrl: raw.webUrl,
     };
 
   }
@@ -176,14 +175,12 @@ class GuardianNews {
         publishedAt: raw.webPublicationDate,
         readTime: Math.ceil(Number(raw.fields.wordcount ?? 0) / WORDS_PER_MINUTE),
         section: raw.sectionName,
-        sourceUrl: raw.webUrl,
         body: raw.fields.body ?? "",
         heroImage: raw.fields.main
           ? this.extractHeroImage(raw.fields.main)
           : raw.fields.thumbnail ?? null,
         publication: raw.fields.publication ?? "The Guardian",
         updatedAt: raw.fields.lastModified ?? null,
-        shareUrl: raw.fields.shortUrl ?? null,
       };
 
     } catch (err) {
