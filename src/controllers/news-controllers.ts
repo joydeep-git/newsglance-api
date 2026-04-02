@@ -4,10 +4,10 @@ import guardianNews from "@/services/news/guardian";
 import newsDb from "@/services/news/news-db";
 import { StatusCode } from "@/types";
 import newsRedis from "@/services/redis/news-redis";
-import gemini from "@/services/google/gemini";
 import userQueries from "@/prisma-utils/user-queries";
 import polly from "@/services/aws/polly";
 import filesQueries from "@/prisma-utils/files-queries";
+import aiSummarization from "@/services/AI/summarization";
 
 
 class NewsControllers {
@@ -262,7 +262,6 @@ class NewsControllers {
       // search if news summerization already exists
       const newsData = await newsDb.getNewsData(newsId);
 
-
       let updatedUser = req.user;
 
 
@@ -294,9 +293,7 @@ class NewsControllers {
         await newsRedis.setSingleNews(news);
       }
 
-      const data = await gemini.summarizeNews({ contents: news.body, isAudio: false });
-
-      if (!data) return next(errRes("Failed to generate summerization!", StatusCode.SERVICE_UNAVAILABLE));
+      const data = await aiSummarization.generateSummary({ content: news.body, isAudio: false });
 
       await newsDb.setNewsdata({ newsId, type: "summary", value: data });
 
@@ -377,9 +374,7 @@ class NewsControllers {
 
 
       //  gemini script
-      const script = await gemini.summarizeNews({ contents: news.body, isAudio: true });
-
-      if (!script) return next(errRes("Failed to generate audio script!", StatusCode.SERVICE_UNAVAILABLE));
+      const script = await aiSummarization.generateSummary({ content: news.body, isAudio: true });
 
 
       // polly generate MP3 and upload to s3
