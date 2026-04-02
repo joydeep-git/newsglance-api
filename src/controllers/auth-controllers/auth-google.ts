@@ -6,6 +6,7 @@ import authQueries from "@/prisma-utils/auth-queries";
 import { randomPasswordGenerator, randomUsernameGenerator } from "@/utils/helpers";
 import authToken from "@/middleware/auth-token";
 import authRedis from "@/services/redis/auth-redis";
+import emailService from "@/services/email/brevo";
 
 
 
@@ -70,6 +71,9 @@ class AuthGoogleController {
           const token = authToken.cookieGenerator(newUser.id);
 
           if (!token) return next(errRes("Unable to login! Please try again.", StatusCode.INTERNAL_SERVER_ERROR));
+
+          // send welcome email
+          emailService.sendWelcomeEmail(payload.email as string, newUser.name as string).catch(() => null);
 
           return res.status(StatusCode.CREATED)
             .cookie("token", token, authToken.cookieConfig())

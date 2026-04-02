@@ -30,6 +30,14 @@ export type EmailSendResponse = {
 }
 
 
+export type ContactUsDataType = {
+  name: string;
+  email: string;
+  subject: string;
+  message: string;
+}
+
+
 
 export type TokenCreateResponseType = {
   httpOnly: boolean;

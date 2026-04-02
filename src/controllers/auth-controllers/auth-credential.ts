@@ -7,6 +7,7 @@ import authRedis from "@/services/redis/auth-redis";
 import { StatusCode } from "@/types/index";
 import type { UserDataType } from "@/types/auth";
 import { fieldValidator, isValidEmail } from "@/utils/helpers";
+import emailService from "@/services/email/brevo";
 
 
 class AuthCredentialControllers {
@@ -67,6 +68,9 @@ class AuthCredentialControllers {
         message: "Account created!",
         data: newUser
       });
+
+      // send welcome email & clean up OTP
+      emailService.sendWelcomeEmail(email, newUser.name as string).catch(() => null);
 
       return await authRedis.deleteOtp({ email, type: "register" });
 

@@ -12,7 +12,7 @@ class UtilityControllers {
 
 
   // generate otp for all
-  public generateOtp = async (req: Request, res: Response, next: NextFunction) => {
+  public async generateOtp(req: Request, res: Response, next: NextFunction) {
 
     try {
 
@@ -87,19 +87,37 @@ class UtilityControllers {
   }
 
 
-  public test = (_: Request, res: Response) => {
+  public test(_: Request, res: Response) {
     res.status(StatusCode.OK).json({ status: StatusCode.OK, message: "Server is Live!" });
   }
 
 
   // reset limit of users free tiers
-  public resetLimit = async (_: Request, res: Response): Promise<void> => {
+  public async resetLimit(_: Request, res: Response): Promise<void> {
 
     await userQueries.resetLimit();
 
     res.status(StatusCode.OK).json({
       message: "Limit restored!"
     });
+
+  }
+
+
+  // contact us page data
+  public async contactUs(req: Request, res: Response) {
+
+    try {
+
+      await emailService.contactMeEmail(req.body);
+
+      return res.status(StatusCode.OK).json({
+        message: "Message sent to Newsglance Team!"
+      });
+
+    } catch (err) {
+      throw errRes("Unable to send message! Please try again", StatusCode.SERVICE_UNAVAILABLE);
+    }
 
   }
 
