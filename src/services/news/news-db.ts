@@ -26,12 +26,7 @@ class NewsDb {
 
     try {
 
-      const data = await db.bookmark.findFirst({
-        where: {
-          userId: userId,
-          newsId
-        }
-      });
+      const data = await db.bookmark.findFirst({ where: { userId, newsId } });
 
       return !!data;
 
