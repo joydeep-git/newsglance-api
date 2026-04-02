@@ -8,6 +8,7 @@ import userQueries from "@/prisma-utils/user-queries";
 import polly from "@/services/aws/polly";
 import filesQueries from "@/prisma-utils/files-queries";
 import aiSummarization from "@/services/AI/summarization";
+import authRedis from "@/services/redis/auth-redis";
 
 
 class NewsControllers {
@@ -223,6 +224,29 @@ class NewsControllers {
   }
 
 
+  public async checkBookmark(req: Request, res: Response, next: NextFunction) {
+
+    try {
+
+      const userId = req.user.id;
+      const newsId: string = req.params.newsId;
+
+      if (!newsId) return next(errRes("NewsId is required!", StatusCode.BAD_REQUEST));
+
+      const isBookmarked = await newsDb.checkBookmark({ userId, newsId });
+
+      return res.status(StatusCode.OK).json({
+        message: "Bookmark status fetched!",
+        data: isBookmarked,
+      })
+
+    } catch (err) {
+      return next(errRouter(err));
+    }
+
+  }
+
+
   public async deleteBookmark(req: Request, res: Response, next: NextFunction) {
 
     try {
@@ -272,7 +296,10 @@ class NewsControllers {
             id: userId, data: {
               newsBalance: newsBalance - 1,
             }
-          })
+          });
+
+          // update on redis
+          await authRedis.setUserData(updatedUser);
         }
 
         return res.status(StatusCode.OK).json({
@@ -302,7 +329,10 @@ class NewsControllers {
           id: userId, data: {
             newsBalance: newsBalance - 1,
           }
-        })
+        });
+
+        // update user data on redis
+        await authRedis.setUserData(updatedUser);
       }
 
       return res.status(200).json({
@@ -350,7 +380,10 @@ class NewsControllers {
             data: {
               audioBalance: audioBalance - 1,
             }
-          })
+          });
+
+          // update userdata on redis
+          await authRedis.setUserData(updatedUser);
         }
 
 
@@ -395,6 +428,9 @@ class NewsControllers {
           id: userId,
           data: { audioBalance: audioBalance - 1 },
         });
+
+        // update user data on redis
+        await authRedis.setUserData(updatedUser);
       }
 
 

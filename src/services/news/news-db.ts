@@ -22,6 +22,25 @@ class NewsDb {
 
   }
 
+  public async checkBookmark({ userId, newsId }: { userId: string; newsId: string; }): Promise<boolean> {
+
+    try {
+
+      const data = await db.bookmark.findFirst({
+        where: {
+          userId: userId,
+          newsId
+        }
+      });
+
+      return !!data;
+
+    } catch (err) {
+      throw err;
+    }
+
+  }
+
   public async getBookmark(userId: string): Promise<BookmarkType[]> {
 
     try {

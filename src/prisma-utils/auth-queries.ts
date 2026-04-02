@@ -120,7 +120,7 @@ const authQueries = {
           password: true
         },
         include: {
-          avatar: false,
+          avatar: true,
         }
       }) as UserDataType;
 

@@ -20,11 +20,13 @@ class NewsRouters {
 
     this.router.get("/single/:newsId(.*)", newsController.getNewsById);
 
-    this.router.post("/bookmark/:newsId", authToken.validator, newsController.addBookmark);
+    this.router.post("/bookmark/:newsId(.*)", authToken.validator, newsController.addBookmark);
 
     this.router.get("/bookmark", authToken.validator, newsController.getBookmark);
 
-    this.router.delete("/bookmark/:newsId", authToken.validator, newsController.deleteBookmark);
+    this.router.get("/bookmark/check/:newsId(.*)", authToken.validator, newsController.checkBookmark);
+
+    this.router.delete("/bookmark/:newsId(.*)", authToken.validator, newsController.deleteBookmark);
 
     this.router.get("/summary/:newsId(.*)", authToken.validator, newsController.summerizeNews);
 

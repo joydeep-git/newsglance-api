@@ -12,7 +12,7 @@ class PaymentControllers {
 
     try {
 
-      if (!req.user.isPremium) {
+      if (req.user.isPremium) {
         return next(errRes("You already have premium membership!", StatusCode.FORBIDDEN));
       }
 
