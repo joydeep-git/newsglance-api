@@ -32,7 +32,10 @@ class AuthToken {
     try {
 
       // getting TOKEN from headers
-      const token: string = req.cookies.token || req.headers.cookie?.split("=")[1] || req.headers.authorization?.split(" ")[1];
+
+      // const token: string = req.cookies.token || req.headers.cookie?.split("=")[1] || req.headers.authorization?.split(" ")[1];
+
+      const token = req.cookies.token;
 
       if (!token) return next(errRes("No Active Session! Please Login!", StatusCode.UNAUTHORIZED));
 
