@@ -74,6 +74,9 @@ class Server {
 
     this.app.use(helmet());
 
+    // trust reverse proxy
+    this.app.set("trust proxy", 1);
+
     this.app.use(
       cors({
         origin: process.env.FRONTEND_URL,
@@ -83,12 +86,23 @@ class Server {
       })
     )
 
+    // 300 req / 15 min / user
     this.app.use(rateLimit({
-      windowMs: 15 * 60 * 1000, // 15 minutes
-      max: 100, // limit each IP
+      windowMs: 15 * 60 * 1000,
+      max: 300,
       standardHeaders: true,
       legacyHeaders: false,
-    }))
+      message: { message: "Too many requests, at max we handle 300 requests per 15 minutes!" },
+    }));
+
+    // auth system abuse guard
+    this.app.use("/api/auth", rateLimit({
+      windowMs: 15 * 60 * 1000,
+      max: 30,
+      standardHeaders: true,
+      legacyHeaders: false,
+      message: { message: "DONT SPAM OUR AUTHENTICATION SYSTEM!" },
+    }));
 
   }
 
