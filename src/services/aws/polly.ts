@@ -45,8 +45,6 @@ class Polly {
 
       );
 
-      console.log("Polly Response =>>  ", response);
-
 
       if (!response.AudioStream) {
         throw errRes("Polly returned no audio stream", StatusCode.SERVICE_UNAVAILABLE);
@@ -60,12 +58,7 @@ class Polly {
         chunks.push(chunk);
       }
 
-      console.log("Polly chunk =>>  ", chunks);
-
-
       const buffer = Buffer.concat(chunks);
-
-      console.log("Polly buffer =>>  ", buffer);
 
 
       // create FILE to upload on s3
