@@ -44,7 +44,8 @@ class CashfreePay {
         customer_details: {
           customer_id: user.id,
           customer_email: user.email,
-          customer_phone: userCountry?.countrycode === "+91" ? user.phoneNumber : "+919876543210",
+          // customer_phone: userCountry?.countrycode === "+91" ? user.phoneNumber : "+919876543210",
+          customer_phone: "+919876543210",
           customer_name: user.name,
         },
         order_note: "Subscription for NewsGlance",
