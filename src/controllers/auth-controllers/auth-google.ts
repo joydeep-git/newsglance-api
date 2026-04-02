@@ -7,6 +7,7 @@ import { randomPasswordGenerator, randomUsernameGenerator } from "@/utils/helper
 import authToken from "@/middleware/auth-token";
 import authRedis from "@/services/redis/auth-redis";
 import emailService from "@/services/email/brevo";
+import { randomUUID } from "crypto";
 
 
 
@@ -58,7 +59,7 @@ class AuthGoogleController {
             password: randomPasswordGenerator(),
             avatarId: await authRedis.getDefaultAvatarId(),
             defaultCountry: "IN",
-            phoneNumber: "9876543210",
+            phoneNumber: randomUUID().slice(0, 15),
           }
 
           req.body = body;
