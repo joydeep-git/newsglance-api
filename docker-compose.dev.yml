@@ -2,25 +2,46 @@ version: "3.8"
 
 services:
   app:
-    build: 
+    build:
       context: .
-      target: deps # STOP at Stage 2! Don't build the 'dist' folder.
+      target: deps # dont build dist folder
     container_name: newsglance-api-dev
     ports:
       - "5000:5000"
     environment:
       NODE_ENV: development
       DATABASE_URL: ${DATABASE_URL}
-      REDIS_URL: redis://altonix:123456@redis-cache:6379
-    
-    # THE MAGIC HAPPENS HERE:
+      REDIS_URL: ${EC2_REDIS_URL}
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY}
+      FRONTEND_URL: ${FRONTEND_URL}
+      GUARDIAN_API_KEY: ${GUARDIAN_API_KEY}
+      GUARDIAN_API_URL: ${GUARDIAN_API_URL}
+      BREVO_USER: ${BREVO_USER}
+      BREVO_PASS: ${BREVO_PASS}
+      BREVO_FROM: ${BREVO_FROM}
+      IP_INFO_TOKEN: ${IP_INFO_TOKEN}
+      AWS_REGION: ${AWS_REGION}
+      AWS_POLLY_REGION: ${AWS_POLLY_REGION}
+      S3_BUCKET_NAME: ${S3_BUCKET_NAME}
+      S3_ACCESS_KEY: ${S3_ACCESS_KEY}
+      S3_SECRET_KEY: ${S3_SECRET_KEY}
+      BEDROCK_ACCESS_KEY: ${BEDROCK_ACCESS_KEY}
+      BEDROCK_SECRET_KEY: ${BEDROCK_SECRET_KEY}
+      POLLY_ACCESS_KEY: ${POLLY_ACCESS_KEY}
+      POLLY_SECRET_KEY: ${POLLY_SECRET_KEY}
+      GEMINI_API_KEY: ${GEMINI_API_KEY}
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+      CASHFREE_APP_ID: ${CASHFREE_APP_ID}
+      CASHFREE_SECRET_KEY: ${CASHFREE_SECRET_KEY}
+      FUEL_PRICE_API: ${FUEL_PRICE_API}
+      FUEL_PRICE_URL: ${FUEL_PRICE_URL}
+
     volumes:
-      - ./:/app # The Wormhole: Syncs your local folder to the container's /app folder in real-time.
-      - /app/node_modules # The Shield: Prevents your Mac/Windows node_modules from overwriting the Linux ones.
-    
-    # Override the production start command with your hot-reload script
-    command: pnpm run dev 
-    
+      - ./:/app
+      - /app/node_module
+
+    command: pnpm run dev
+
     depends_on:
       - redis-cache
 

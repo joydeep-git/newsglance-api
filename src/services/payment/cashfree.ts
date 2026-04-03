@@ -4,7 +4,6 @@ import { StatusCode } from "@/types";
 import { PaymentStatusType } from "@/types/payment";
 import { UserDataType } from "@/types/auth";
 import { Cashfree, CFEnvironment, OrderEntity } from "cashfree-pg";
-import { countryMap } from "@/utils/constants";
 
 
 class CashfreePay {
@@ -35,8 +34,6 @@ class CashfreePay {
   public createOrder = async ({ user }: { user: UserDataType; }): Promise<OrderEntity> => {
 
     try {
-
-      const userCountry = countryMap.get(user?.defaultCountry);
 
       const res = await this.cashfree.PGCreateOrder({
         order_amount: 119,

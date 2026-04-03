@@ -12,6 +12,8 @@ class UtilityRouters {
 
     this.router.get("/test", utilityControllers.test);
 
+    this.router.get("/health", utilityControllers.test);
+
     this.router.post("/generate-otp", utilityControllers.generateOtp);
 
     this.router.get("/reset-limit", utilityControllers.resetLimit);
