@@ -39,7 +39,7 @@ class CloudStorage {
 
     try {
 
-      const key: string = `${type}/${randomUUID().substring(0, 12)}-${file.originalname}`;
+      const key: string = String(`${type}/${randomUUID().substring(0, 14)}-${file.originalname.trim()}`).trim();
 
       const data = await this.client.send(
         new PutObjectCommand({
@@ -61,8 +61,6 @@ class CloudStorage {
     }
 
   }
-
-
 
 
   public async fileExists(key: string): Promise<boolean> {

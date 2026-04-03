@@ -1,7 +1,7 @@
 import axios from "axios";
 import { GeolocationData } from "@/types";
 
-class LocationService {
+class IpInfo {
 
 
   public async getLocation(ip: string): Promise<string | null > {
@@ -17,6 +17,6 @@ class LocationService {
 }
 
 
-const locationService = new LocationService();
+const ipInfo = new IpInfo();
 
-export default locationService;
+export default ipInfo;

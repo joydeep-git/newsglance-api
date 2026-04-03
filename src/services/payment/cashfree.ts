@@ -1,13 +1,12 @@
 
 import { errorPrinter, errRes } from "@/errors/error-responder";
 import { StatusCode } from "@/types";
-import { PaymentStatusType } from "@/types/payment-types";
-import { UserDataType } from "@/types/auth-types";
+import { PaymentStatusType } from "@/types/payment";
+import { UserDataType } from "@/types/auth";
 import { Cashfree, CFEnvironment, OrderEntity } from "cashfree-pg";
-import { countryMap } from "@/utils/constants";
 
 
-class PaymentService {
+class CashfreePay {
 
   private cashfree: Cashfree;
 
@@ -36,15 +35,14 @@ class PaymentService {
 
     try {
 
-      const userCountry = countryMap.get(user?.defaultCountry);
-
       const res = await this.cashfree.PGCreateOrder({
         order_amount: 119,
         order_currency: "INR",
         customer_details: {
           customer_id: user.id,
           customer_email: user.email,
-          customer_phone: userCountry?.countrycode === "+91" ? user.phoneNumber : "+919876543210",
+          // customer_phone: userCountry?.countrycode === "+91" ? user.phoneNumber : "+919876543210",
+          customer_phone: "+919876543210",
           customer_name: user.name,
         },
         order_note: "Subscription for NewsGlance",
@@ -112,11 +110,12 @@ class PaymentService {
   }
 
 
+  
 
 
 }
 
-const paymentService = new PaymentService();
+const cashfree = new CashfreePay();
 
-export default paymentService;
+export default cashfree;
 

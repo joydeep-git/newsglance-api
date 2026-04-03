@@ -7,6 +7,7 @@ export enum StatusCode {
   FORBIDDEN = 403,
   NOT_FOUND = 404,
   CONFLICT = 409,
+  TOO_MANY_REQUESTS = 429,
   PAYLOAD_TOO_LARGE = 413,
   INTERNAL_SERVER_ERROR = 500,
   SERVICE_UNAVAILABLE = 503,
@@ -26,6 +27,14 @@ export type EmailSendResponse = {
     to: string[];
   };
   messageId: string;
+}
+
+
+export type ContactUsDataType = {
+  name: string;
+  email: string;
+  subject: string;
+  message: string;
 }
 
 
@@ -59,6 +68,7 @@ export interface FileDataType{
   fileSize: number;
   createdAt: Date;
   isDefaultFile: boolean;
+  duration?: number | null;
 };
 
 
@@ -71,9 +81,38 @@ export interface AudioFileType extends FileDataType {
 }
 
 
+export type FileCreateType = {
+  url: string;
+  file: {
+    size: number;
+    originalname?: string; 
+    filename?: string;
+    duration?: number;
+  };
+  type: "image" | "audio";
+}
+
+
+
 export type CountryMapType = {
   name: string;
   countrycode: string;
   currency: string;
   flag: string;
+}
+
+
+export type FuelPriceResponseType = {
+  "city": string,
+  "price": string,
+  "change": string
+}
+
+
+
+export type GeminiErrorType = {
+  status?: number;
+  message?: string;
+  code?: number | string;
+  errorDetails?: { reason?: string }[];
 }

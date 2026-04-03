@@ -1,11 +1,13 @@
 import nodemailer, { Transporter } from "nodemailer";
-import { EmailSendResponse } from "@/types";
-import { OtpType } from "@/types/auth-types";
+import { ContactUsDataType, EmailSendResponse } from "@/types";
+import { OtpType } from "@/types/auth";
 import registationOtpTemplate from "@/templates/register-otp-template";
 import generalOtpTemplate from "@/templates/general-otp-template";
 import loginOtpTemplate from "@/templates/login-otp-template";
 import deleteAccOtpTemplate from "@/templates/delete-acc-otp-template";
 import forgetPassOtpTemplate from "@/templates/forget-password-otp-template";
+import welcomeTemplate from "@/templates/welcome-template";
+import contactUsTemplate from "@/templates/contact-us-template";
 
 
 class BrevoEmailService {
@@ -18,6 +20,8 @@ class BrevoEmailService {
     "forget-password": "Reset password - Newsglance",
     "delete-account": "Delete account - Newsglance"
   }
+
+  private companyEmail: string = process.env.BREVO_FROM!;
 
   private emailTemplate = (type: OtpType, otp: string): string => {
 
@@ -70,6 +74,36 @@ class BrevoEmailService {
       throw err;
     }
 
+  }
+
+
+  public async sendWelcomeEmail(email: string, name: string) {
+
+    return await this.transporter.sendMail({
+      from: `Newsglance <${this.companyEmail}>`,
+      to: email,
+      subject: "Welcome to Newsglance 🎉",
+      html: welcomeTemplate(name),
+    });
+
+  }
+
+
+  // contact us page user questions
+  public async contactMeEmail(body: ContactUsDataType) {
+
+    try {
+      return await this.transporter.sendMail({
+        from: `Newsglance <${this.companyEmail}>`,
+        to: "joydeepdas@zohomail.com",
+        replyTo: body.email,
+        subject: `[Contact Us] ${body.subject} - Newsglance`,
+        html: contactUsTemplate(body),
+      });
+
+    } catch (err) {
+      throw err;
+    }
   }
 
 }

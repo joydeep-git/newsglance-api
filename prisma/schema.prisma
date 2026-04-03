@@ -28,8 +28,9 @@ model User {
   avatarId String
   avatar   File   @relation("avatar", fields: [avatarId], references: [id], onDelete: Restrict)
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  bookmarks Bookmark[]
 
   @@index([avatarId])
 }
@@ -40,18 +41,29 @@ model File {
   url      String   @unique
   fileSize Float
   type     FileType
+  duration Float?
 
   isDefaultFile Boolean @default(false)
 
   createdAt DateTime @default(now())
 
-  // Relatiosession_my4p3vj0rTS_ANcTbNOV2Za5NiVgNo188YyPVrK4FOSzXzTQVABkHiey_goSbeyyIpGL73cJUZ5zQPqMOxpgaLHicaOuEpy_upvlHCtFKqYJhvAT2HzVz3lhAnREcApaymentpaymentns
   newsAudio   NewsData[] @relation("AudioFile")
   usersAvatar User[]     @relation("avatar")
 }
 
+model Bookmark {
+  newsId    String
+  userId    String
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([userId, newsId])
+  @@index([userId])
+}
+
 model Payment {
-  orderId  String        @unique
+  orderId  String        @id
   userId   String
   amount   Float
   currency String        @default("INR")
@@ -66,12 +78,13 @@ model Payment {
 }
 
 model NewsData {
-  id            String  @id @default(cuid())
-  guardianId    String  @unique
+  newsId String @id
+
   summarization String?
 
   audioFileId String?
-  audioFile   File?   @relation("AudioFile", fields: [audioFileId], references: [id], onDelete: SetNull)
+
+  audioFile File? @relation("AudioFile", fields: [audioFileId], references: [id], onDelete: SetNull)
 
   comments Comment[]
 
@@ -86,7 +99,7 @@ model Comment {
 
   createdAt DateTime @default(now())
 
-  news NewsData @relation(fields: [newsId], references: [id], onDelete: Cascade)
+  news NewsData @relation(fields: [newsId], references: [newsId], onDelete: Cascade)
   user User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])

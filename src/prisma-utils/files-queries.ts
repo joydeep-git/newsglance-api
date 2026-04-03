@@ -1,12 +1,13 @@
 import { errRouter } from "@/errors/error-responder";
-import { AudioFileType, ImageFileType } from "@/types/index";
+import { AudioFileType, FileCreateType, ImageFileType } from "@/types/index";
 import db from "@/prisma-utils/db-client";
+import { randomUUID } from "node:crypto";
 
 
 class FilesQueries {
 
 
-  public async createNewFile({ url, file, type }: { url: string; file: Express.Multer.File; type: "image" | "audio"; }): Promise<ImageFileType | AudioFileType> {
+  public async createNewFile({ url, file, type }: FileCreateType ): Promise<ImageFileType | AudioFileType> {
 
     try {
 
@@ -14,8 +15,9 @@ class FilesQueries {
         data: {
           url,
           type,
-          fileSize: file.size,
-          name: file.originalname || file.filename,
+          fileSize: file.size!,
+          name: file.originalname || file.filename || randomUUID().slice(0, 12).toString(),
+          duration: file.duration ?? 0,
         }
       });
 

@@ -2,17 +2,16 @@ version: "3.8"
 
 services:
   app:
-    build: .
-
-    container_name: newsglance-api
-
+    build:
+      context: .
+      target: deps # dont build dist folder
+    container_name: newsglance-api-dev
     ports:
       - "5000:5000"
-
     environment:
-      NODE_ENV: production
+      NODE_ENV: development
       DATABASE_URL: ${DATABASE_URL}
-      REDIS_URL: ${REDIS_URL}
+      REDIS_URL: ${EC2_REDIS_URL}
       JWT_SECRET_KEY: ${JWT_SECRET_KEY}
       FRONTEND_URL: ${FRONTEND_URL}
       GUARDIAN_API_KEY: ${GUARDIAN_API_KEY}
@@ -37,21 +36,18 @@ services:
       FUEL_PRICE_API: ${FUEL_PRICE_API}
       FUEL_PRICE_URL: ${FUEL_PRICE_URL}
 
-    restart: unless-stopped
+    volumes:
+      - ./:/app
+      - /app/node_module
 
-    healthcheck:
-      test:
-        [
-          "CMD",
-          "node",
-          "--eval",
-          "fetch('http://localhost:5000/api/health').then(r=>{if(r.status!==200)process.exit(1)}).catch(()=>process.exit(1))",
-        ]
+    command: pnpm run dev
 
-      interval: 30s
+    depends_on:
+      - redis-cache
 
-      timeout: 5s
-
-      retries: 3
-
-      start_period: 20s
+  redis-cache:
+    image: redis:7-alpine
+    container_name: newsglance-redis-dev
+    ports:
+      - "48921:6379"
+    command: ["redis-server", "--user", "altonix", "on", ">123456", "~*", "+@all"]
