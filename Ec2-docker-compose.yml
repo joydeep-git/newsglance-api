@@ -1,0 +1,99 @@
+# ============================================================
+# Ec2-docker-compose.yml  (copy this → docker-compose.yml on EC2)
+#
+# What's different from dev:
+#   - Redis runs INSIDE Docker (redis-cache service)
+#   - App connects to Redis via Docker service name (redis-cache)
+#   - No host port exposed for Redis (not needed externally)
+#   - app depends_on redis-cache with health check
+#   - Prisma migrate runs via entrypoint.sh (NOT at build time)
+#   - Uses Aiven PG for now (swap DATABASE_URL in .env for RDS later)
+# ============================================================
+
+version: "3.8"
+
+services:
+
+  # ── Redis (internal to Docker network — ultra fast) ─────────────────────
+  redis-cache:
+    image: redis:7-alpine
+    container_name: newsglance-redis
+    # No external port binding — only the app container needs Redis
+    expose:
+      - "6379"
+    command:
+      [
+        "redis-server",
+        "--user", "altonix", "on", ">123456", "~*", "+@all",
+        "--save", "60", "1",
+        "--loglevel", "warning"
+      ]
+    restart: unless-stopped
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "-u", "redis://altonix:123456@localhost:6379", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  # ── API Application ──────────────────────────────────────────────────────
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile   # on EC2 this IS the Ec2-Dockerfile (renamed)
+    container_name: newsglance-api
+
+    ports:
+      - "5000:5000"
+
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: ${DATABASE_URL}
+      REDIS_URL: redis://altonix:123456@redis-cache:6379   # ← Docker service name
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY}
+      FRONTEND_URL: ${FRONTEND_URL}
+      GUARDIAN_API_KEY: ${GUARDIAN_API_KEY}
+      GUARDIAN_API_URL: ${GUARDIAN_API_URL}
+      BREVO_USER: ${BREVO_USER}
+      BREVO_PASS: ${BREVO_PASS}
+      BREVO_FROM: ${BREVO_FROM}
+      IP_INFO_TOKEN: ${IP_INFO_TOKEN}
+      AWS_REGION: ${AWS_REGION}
+      AWS_POLLY_REGION: ${AWS_POLLY_REGION}
+      S3_BUCKET_NAME: ${S3_BUCKET_NAME}
+      S3_ACCESS_KEY: ${S3_ACCESS_KEY}
+      S3_SECRET_KEY: ${S3_SECRET_KEY}
+      BEDROCK_ACCESS_KEY: ${BEDROCK_ACCESS_KEY}
+      BEDROCK_SECRET_KEY: ${BEDROCK_SECRET_KEY}
+      POLLY_ACCESS_KEY: ${POLLY_ACCESS_KEY}
+      POLLY_SECRET_KEY: ${POLLY_SECRET_KEY}
+      GEMINI_API_KEY: ${GEMINI_API_KEY}
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+      CASHFREE_APP_ID: ${CASHFREE_APP_ID}
+      CASHFREE_SECRET_KEY: ${CASHFREE_SECRET_KEY}
+      FUEL_PRICE_API: ${FUEL_PRICE_API}
+      FUEL_PRICE_URL: ${FUEL_PRICE_URL}
+
+    depends_on:
+      redis-cache:
+        condition: service_healthy   # wait for Redis to be ready
+
+    restart: unless-stopped
+
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "--eval",
+          "fetch('http://localhost:5000/api/health').then(r=>{if(r.status!==200)process.exit(1)}).catch(()=>process.exit(1))"
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s    # give extra time for migrations to finish
+
+volumes:
+  redis_data:
