@@ -1,13 +1,13 @@
 import nodemailer, { Transporter } from "nodemailer";
-import { ContactUsDataType, EmailSendResponse } from "@/types";
-import { OtpType } from "@/types/auth";
-import registationOtpTemplate from "@/templates/register-otp-template";
-import generalOtpTemplate from "@/templates/general-otp-template";
-import loginOtpTemplate from "@/templates/login-otp-template";
-import deleteAccOtpTemplate from "@/templates/delete-acc-otp-template";
-import forgetPassOtpTemplate from "@/templates/forget-password-otp-template";
-import welcomeTemplate from "@/templates/welcome-template";
-import contactUsTemplate from "@/templates/contact-us-template";
+import { ContactUsDataType, EmailSendResponse } from "../../types";
+import { OtpType } from "../../types/auth";
+import registationOtpTemplate from "../../templates/register-otp-template";
+import generalOtpTemplate from "../../templates/general-otp-template";
+import loginOtpTemplate from "../../templates/login-otp-template";
+import deleteAccOtpTemplate from "../../templates/delete-acc-otp-template";
+import forgetPassOtpTemplate from "../../templates/forget-password-otp-template";
+import welcomeTemplate from "../../templates/welcome-template";
+import contactUsTemplate from "../../templates/contact-us-template";
 
 
 class BrevoEmailService {

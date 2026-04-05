@@ -1,6 +1,6 @@
-import { errRouter } from "@/errors/error-responder";
-import { AudioFileType, FileCreateType, ImageFileType } from "@/types/index";
-import db from "@/prisma-utils/db-client";
+import { errRouter } from "../errors/error-responder";
+import { AudioFileType, FileCreateType, ImageFileType } from "../types/index";
+import db from "./db-client";
 import { randomUUID } from "node:crypto";
 
 

@@ -1,8 +1,8 @@
-import { errorPrinter, errRes, errRouter } from "@/errors/error-responder";
-import paymentQueries from "@/prisma-utils/payment-queries";
-import cashfree from "@/services/payment/cashfree";
-import authRedis from "@/services/redis/auth-redis";
-import { StatusCode } from "@/types";
+import { errorPrinter, errRes, errRouter } from "../errors/error-responder";
+import paymentQueries from "../prisma-utils/payment-queries";
+import cashfree from "../services/payment/cashfree";
+import authRedis from "../services/redis/auth-redis";
+import { StatusCode } from "../types";
 import { NextFunction, Request, Response } from "express";
 
 

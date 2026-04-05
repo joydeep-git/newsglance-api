@@ -1,8 +1,8 @@
-import db from "@/prisma-utils/db-client";
-import authRedis from "@/services/redis/auth-redis";
+import db from "./db-client";
+import authRedis from "../services/redis/auth-redis";
 import filesQueries from "./files-queries";
-import { ImageFileType } from "@/types";
-import { errorPrinter } from "@/errors/error-responder";
+import { ImageFileType } from "../types";
+import { errorPrinter } from "../errors/error-responder";
 
 
 const prismaSeeding = async () => {

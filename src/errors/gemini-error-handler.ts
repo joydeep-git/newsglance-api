@@ -1,7 +1,7 @@
 
-import ErrorHandler from "@/errors/error-handler";
-import { GeminiErrorType, StatusCode } from "@/types";
-import { errorPrinter } from "@/errors/error-responder";
+import ErrorHandler from "./error-handler";
+import { GeminiErrorType, StatusCode } from "../types";
+import { errorPrinter } from "./error-responder";
 
 
 const geminiErrCode = (status: string): number | undefined => {

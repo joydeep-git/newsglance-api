@@ -1,12 +1,12 @@
 import { NextFunction, Request, Response } from "express";
-import { errRes, errRouter } from "@/errors/error-responder";
+import { errRes, errRouter } from "../../errors/error-responder";
 import { OAuth2Client, TokenPayload } from "google-auth-library";
-import { StatusCode } from "@/types";
-import authQueries from "@/prisma-utils/auth-queries";
-import { randomPasswordGenerator, randomUsernameGenerator } from "@/utils/helpers";
-import authToken from "@/middleware/auth-token";
-import authRedis from "@/services/redis/auth-redis";
-import emailService from "@/services/email/brevo";
+import { StatusCode } from "../../types";
+import authQueries from "../../prisma-utils/auth-queries";
+import { randomPasswordGenerator, randomUsernameGenerator } from "../../utils/helpers";
+import authToken from "../../middleware/auth-token";
+import authRedis from "../../services/redis/auth-redis";
+import emailService from "../../services/email/brevo";
 import { randomUUID } from "crypto";
 
 

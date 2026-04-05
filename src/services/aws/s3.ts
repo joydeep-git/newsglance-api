@@ -1,6 +1,6 @@
 import { DeleteObjectCommand, HeadObjectCommand, HeadObjectCommandOutput, PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import { randomUUID } from "node:crypto";
-import { errRouter } from "@/errors/error-responder";
+import { errRouter } from "../../errors/error-responder";
 
 
 class CloudStorage {

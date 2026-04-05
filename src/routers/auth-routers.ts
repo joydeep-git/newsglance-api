@@ -1,9 +1,9 @@
 
 import express, { Router } from "express";
-import authControllers from "@/controllers/auth-controllers/auth-credential";
-import authGoogleController from "@/controllers/auth-controllers/auth-google";
-import authGeneralControllers from "@/controllers/auth-controllers/auth-general";
-import authToken from "@/middleware/auth-token";
+import authControllers from "../controllers/auth-controllers/auth-credential";
+import authGoogleController from "../controllers/auth-controllers/auth-google";
+import authGeneralControllers from "../controllers/auth-controllers/auth-general";
+import authToken from "../middleware/auth-token";
 
 
 class AuthRouters {

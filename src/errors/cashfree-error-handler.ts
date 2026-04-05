@@ -1,7 +1,7 @@
-import ErrorHandler from "@/errors/error-handler";
-import { StatusCode } from "@/types";
+import ErrorHandler from "./error-handler";
+import { StatusCode } from "../types";
 import { errorPrinter } from "./error-responder";
-import { CashfreeErrorType } from "@/types/payment";
+import { CashfreeErrorType } from "../types/payment";
 
 
 

@@ -1,12 +1,12 @@
 import { NextFunction, Request, Response } from "express";
-import { StatusCode } from "@/types/index";
-import { errorPrinter, errRes, errRouter } from "@/errors/error-responder";
-import { isValidEmail } from "@/utils/helpers";
+import { StatusCode } from "../../types/index";
+import { errorPrinter, errRes, errRouter } from "../../errors/error-responder";
+import { isValidEmail } from "../../utils/helpers";
 import * as argon2 from "argon2";
-import authQueries from "@/prisma-utils/auth-queries";
-import cloudStorage from "@/services/aws/s3";
-import filesQueries from "@/prisma-utils/files-queries";
-import authRedis from "@/services/redis/auth-redis";
+import authQueries from "../../prisma-utils/auth-queries";
+import cloudStorage from "../../services/aws/s3";
+import filesQueries from "../../prisma-utils/files-queries";
+import authRedis from "../../services/redis/auth-redis";
 
 
 class AuthGeneralControllers {

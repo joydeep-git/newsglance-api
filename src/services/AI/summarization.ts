@@ -1,7 +1,7 @@
-import { errorPrinter, errRes } from "@/errors/error-responder";
+import { errorPrinter, errRes } from "../../errors/error-responder";
 import bedrock from "../aws/bedrock";
 import gemini from "../google/gemini";
-import { StatusCode } from "@/types";
+import { StatusCode } from "../../types";
 
 
 class AiSummarization {

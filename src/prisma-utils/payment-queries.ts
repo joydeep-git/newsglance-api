@@ -1,7 +1,7 @@
 
-import { UserDataType } from "@/types/auth";
+import { UserDataType } from "../types/auth";
 import db from "./db-client";
-import { CreatePaymentRecordType, PaymentDataType } from "@/types/payment";
+import { CreatePaymentRecordType, PaymentDataType } from "../types/payment";
 
 
 

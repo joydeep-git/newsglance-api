@@ -1,10 +1,10 @@
 import { NextFunction, Request, Response } from "express";
 import jwt, { JwtPayload } from "jsonwebtoken";
-import { StatusCode, TokenCreateResponseType } from "@/types/index";
-import { errRes, errRouter } from "@/errors/error-responder";
-import authRedis from "@/services/redis/auth-redis";
-import { UserDataType } from "@/types/auth";
-import authQueries from "@/prisma-utils/auth-queries";
+import { StatusCode, TokenCreateResponseType } from "../types/index";
+import { errRes, errRouter } from "../errors/error-responder";
+import authRedis from "../services/redis/auth-redis";
+import { UserDataType } from "../types/auth";
+import authQueries from "../prisma-utils/auth-queries";
 
 
 
