@@ -1,6 +1,6 @@
-import { errRouter } from "../errors/error-responder";
-import { AudioFileType, FileCreateType, ImageFileType } from "../types/index";
-import db from "./db-client";
+import { errRouter } from "../errors/error-responder.js";
+import { AudioFileType, FileCreateType, ImageFileType } from "../types/index.js";
+import db from "./db-client.js";
 import { randomUUID } from "node:crypto";
 
 

@@ -1,5 +1,5 @@
 import express, { Router } from "express";
-import utilityControllers from "../controllers/utility-controllers";
+import utilityControllers from "../controllers/utility-controllers.js";
 
 
 class UtilityRouters {

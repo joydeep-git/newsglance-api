@@ -1,8 +1,8 @@
 import argon2 from 'argon2';
-import db from "./db-client"
-import { UserDataType } from '../types/auth';
+import db from "./db-client.js"
+import { UserDataType } from '../types/auth.js';
 import { Request } from 'express';
-import { errRouter } from '../errors/error-responder';
+import { errRouter } from '../errors/error-responder.js';
 
 
 const authQueries = {

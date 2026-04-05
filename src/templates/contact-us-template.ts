@@ -1,4 +1,4 @@
-import { ContactUsDataType } from "../types";
+import { ContactUsDataType } from "../types/index.js";
 
 const contactUsTemplate = (body: ContactUsDataType) => (
 

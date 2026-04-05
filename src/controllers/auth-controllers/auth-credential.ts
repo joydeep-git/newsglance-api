@@ -1,13 +1,13 @@
 import argon2 from "argon2";
 import type { NextFunction, Request, Response } from "express";
-import { errRes, errRouter } from "../../errors/error-responder";
-import authToken from "../../middleware/auth-token";
-import authQueries from "../../prisma-utils/auth-queries";
-import authRedis from "../../services/redis/auth-redis";
-import { StatusCode } from "../../types/index";
-import type { UserDataType } from "../../types/auth";
-import { fieldValidator, isValidEmail } from "../../utils/helpers";
-import emailService from "../../services/email/brevo";
+import { errRes, errRouter } from "../../errors/error-responder.js";
+import authToken from "../../middleware/auth-token.js";
+import authQueries from "../../prisma-utils/auth-queries.js";
+import authRedis from "../../services/redis/auth-redis.js";
+import { StatusCode } from "../../types/index.js";
+import type { UserDataType } from "../../types/auth.js";
+import { fieldValidator, isValidEmail } from "../../utils/helpers.js";
+import emailService from "../../services/email/brevo.js";
 
 
 class AuthCredentialControllers {

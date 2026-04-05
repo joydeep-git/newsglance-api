@@ -1,7 +1,7 @@
 
-import { UserDataType } from "../types/auth";
-import db from "./db-client";
-import { CreatePaymentRecordType, PaymentDataType } from "../types/payment";
+import { UserDataType } from "../types/auth.js";
+import db from "./db-client.js";
+import { CreatePaymentRecordType, PaymentDataType } from "../types/payment.js";
 
 
 

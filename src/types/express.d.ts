@@ -1,4 +1,4 @@
-import { UserDataType } from "./auth";
+import { UserDataType } from "./auth.js";
 
 
 declare global {

@@ -1,7 +1,7 @@
-import { errorPrinter, errRes } from "../../errors/error-responder";
-import bedrock from "../aws/bedrock";
-import gemini from "../google/gemini";
-import { StatusCode } from "../../types";
+import { errorPrinter, errRes } from "../../errors/error-responder.js";
+import bedrock from "../aws/bedrock.js";
+import gemini from "../google/gemini.js";
+import { StatusCode } from "../../types/index.js";
 
 
 class AiSummarization {
