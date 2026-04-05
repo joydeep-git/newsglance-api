@@ -1,6 +1,6 @@
-import { errorPrinter } from '../../errors/error-responder';
+import { errorPrinter } from '../../errors/error-responder.js';
 import dotenv from 'dotenv';
-import Redis from "ioredis";
+import { Redis } from "ioredis";
 
 class RedisService {
 
@@ -18,7 +18,7 @@ class RedisService {
 
     this.redis.on("connect", () => errorPrinter("Redis Connected on", this.redisUrl));
 
-    this.redis.on("error", (err) => errorPrinter("Redis Connection Error", err));
+    this.redis.on("error", (err: Error) => errorPrinter("Redis Connection Error", err));
 
   }
 

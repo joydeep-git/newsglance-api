@@ -1,8 +1,8 @@
-import db from "./db-client";
-import authRedis from "../services/redis/auth-redis";
-import filesQueries from "./files-queries";
-import { ImageFileType } from "../types";
-import { errorPrinter } from "../errors/error-responder";
+import db from "./db-client.js";
+import authRedis from "../services/redis/auth-redis.js";
+import filesQueries from "./files-queries.js";
+import { ImageFileType } from "../types/index.js";
+import { errorPrinter } from "../errors/error-responder.js";
 
 
 const prismaSeeding = async () => {

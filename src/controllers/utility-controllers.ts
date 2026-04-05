@@ -1,11 +1,11 @@
 import { NextFunction, Request, Response } from "express";
-import { StatusCode } from "../types";
-import { errRes, errRouter } from "../errors/error-responder";
-import { isValidEmail, otpGenerator } from '../utils/helpers';
-import authQueries from '../prisma-utils/auth-queries';
-import emailService from "../services/email/brevo";
-import authRedis from "../services/redis/auth-redis";
-import userQueries from "../prisma-utils/user-queries";
+import { StatusCode } from "../types/index.js";
+import { errRes, errRouter } from "../errors/error-responder.js";
+import { isValidEmail, otpGenerator } from '../utils/helpers.js';
+import authQueries from '../prisma-utils/auth-queries.js';
+import emailService from "../services/email/brevo.js";
+import authRedis from "../services/redis/auth-redis.js";
+import userQueries from "../prisma-utils/user-queries.js";
 
 
 class UtilityControllers {

@@ -1,7 +1,7 @@
-import ErrorHandler from "./error-handler";
-import { StatusCode } from "../types";
-import { errorPrinter } from "./error-responder";
-import { Prisma } from "../generated/prisma/client";
+import ErrorHandler from "./error-handler.js";
+import { StatusCode } from "../types/index.js";
+import { errorPrinter } from "./error-responder.js";
+import { Prisma } from "../generated/prisma/client.js";
 
 
 

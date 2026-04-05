@@ -1,14 +1,14 @@
 import { NextFunction, Request, Response } from "express";
-import { errRes, errRouter } from "../errors/error-responder";
-import guardianNews from "../services/news/guardian";
-import newsDb from "../services/news/news-db";
-import { StatusCode } from "../types";
-import newsRedis from "../services/redis/news-redis";
-import userQueries from "../prisma-utils/user-queries";
-import polly from "../services/aws/polly";
-import filesQueries from "../prisma-utils/files-queries";
-import aiSummarization from "../services/AI/summarization";
-import authRedis from "../services/redis/auth-redis";
+import { errRes, errRouter } from "../errors/error-responder.js";
+import guardianNews from "../services/news/guardian.js";
+import newsDb from "../services/news/news-db.js";
+import { StatusCode } from "../types/index.js";
+import newsRedis from "../services/redis/news-redis.js";
+import userQueries from "../prisma-utils/user-queries.js";
+import polly from "../services/aws/polly.js";
+import filesQueries from "../prisma-utils/files-queries.js";
+import aiSummarization from "../services/AI/summarization.js";
+import authRedis from "../services/redis/auth-redis.js";
 
 
 class NewsControllers {

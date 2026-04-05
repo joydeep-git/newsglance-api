@@ -1,8 +1,8 @@
 import { PollyClient, SynthesizeSpeechCommand, Engine, OutputFormat, TextType, VoiceId } from "@aws-sdk/client-polly";
-import { errRes, errRouter } from "../../errors/error-responder";
-import { PollyAudioResultType } from "../../types/news";
-import cloudStorage from "../../services/aws/s3";
-import { StatusCode } from "../../types";
+import { errRes, errRouter } from "../../errors/error-responder.js";
+import { PollyAudioResultType } from "../../types/news.js";
+import cloudStorage from "../../services/aws/s3.js";
+import { StatusCode } from "../../types/index.js";
 import { Readable } from "node:stream";
 
 

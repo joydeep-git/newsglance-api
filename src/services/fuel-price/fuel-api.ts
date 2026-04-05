@@ -1,5 +1,5 @@
 import axios from "axios";
-import { FuelPriceResponseType } from "../../types";
+import { FuelPriceResponseType } from "../../types/index.js";
 
 
 class FuelPrice {

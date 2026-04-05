@@ -1,12 +1,12 @@
 import { NextFunction, Request, Response } from "express";
-import { errRes, errRouter } from "../../errors/error-responder";
+import { errRes, errRouter } from "../../errors/error-responder.js";
 import { OAuth2Client, TokenPayload } from "google-auth-library";
-import { StatusCode } from "../../types";
-import authQueries from "../../prisma-utils/auth-queries";
-import { randomPasswordGenerator, randomUsernameGenerator } from "../../utils/helpers";
-import authToken from "../../middleware/auth-token";
-import authRedis from "../../services/redis/auth-redis";
-import emailService from "../../services/email/brevo";
+import { StatusCode } from "../../types/index.js";
+import authQueries from "../../prisma-utils/auth-queries.js";
+import { randomPasswordGenerator, randomUsernameGenerator } from "../../utils/helpers.js";
+import authToken from "../../middleware/auth-token.js";
+import authRedis from "../../services/redis/auth-redis.js";
+import emailService from "../../services/email/brevo.js";
 import { randomUUID } from "crypto";
 
 

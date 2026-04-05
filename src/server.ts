@@ -6,17 +6,17 @@ import cookieParser from "cookie-parser";
 import rateLimit from "express-rate-limit";
 import cors from "cors";
 
-import errorMiddleware from "./errors/error-middleware";
-import routeErrorHandler from "./middleware/route-error-handler";
-import { responseWrapper } from "./middleware/response-wrapper";
+import errorMiddleware from "./errors/error-middleware.js";
+import routeErrorHandler from "./middleware/route-error-handler.js";
+import { responseWrapper } from "./middleware/response-wrapper.js";
 
-import authRouters from "./routers/auth-routers";
-import userRouters from "./routers/user-routers";
-import newsRouters from "./routers/news-routers";
-import utilityRouters from "./routers/utility-routers";
-import paymentRouters from "./routers/payment-routers";
+import authRouters from "./routers/auth-routers.js";
+import userRouters from "./routers/user-routers.js";
+import newsRouters from "./routers/news-routers.js";
+import utilityRouters from "./routers/utility-routers.js";
+import paymentRouters from "./routers/payment-routers.js";
 
-import prismaSeeding from "./prisma-utils/prisma-seeding";
+import prismaSeeding from "./prisma-utils/prisma-seeding.js";
 
 
 

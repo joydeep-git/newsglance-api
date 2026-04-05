@@ -1,6 +1,6 @@
 import { AxiosError } from "axios";
-import ErrorHandler from "./error-handler";
-import { StatusCode } from "../types";
+import ErrorHandler from "./error-handler.js";
+import { StatusCode } from "../types/index.js";
 
 
 const guardianErrorHandler = (err: AxiosError, context?: string): ErrorHandler => {

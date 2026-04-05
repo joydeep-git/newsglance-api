@@ -1,5 +1,5 @@
 
-import { StatusCode } from "../types";
+import { StatusCode } from "../types/index.js";
 
 
 class ErrorHandler extends Error {

@@ -1,4 +1,4 @@
-import { ImageFileType } from "./index";
+import { ImageFileType } from "./index.js";
 
 
 export type UserDataType = {

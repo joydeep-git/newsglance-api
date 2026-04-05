@@ -1,8 +1,8 @@
 
-import { errorPrinter, errRes } from "../../errors/error-responder";
-import { StatusCode } from "../../types";
-import { PaymentStatusType } from "../../types/payment";
-import { UserDataType } from "../../types/auth";
+import { errorPrinter, errRes } from "../../errors/error-responder.js";
+import { StatusCode } from "../../types/index.js";
+import { PaymentStatusType } from "../../types/payment.js";
+import { UserDataType } from "../../types/auth.js";
 import { Cashfree, CFEnvironment, OrderEntity } from "cashfree-pg";
 
 

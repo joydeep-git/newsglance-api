@@ -1,6 +1,6 @@
-import Redis from "ioredis";
-import redisService from "../../services/redis/redis";
-import { ArticleDetail, HomeResponse, NewsResponse } from "../../types/news";
+import { Redis } from "ioredis";
+import redisService from "../../services/redis/redis.js";
+import { ArticleDetail, HomeResponse, NewsResponse } from "../../types/news.js";
 
 
 
