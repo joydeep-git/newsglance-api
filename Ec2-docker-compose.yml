@@ -1,24 +1,11 @@
-# ============================================================
-# Ec2-docker-compose.yml  (copy this → docker-compose.yml on EC2)
-#
-# What's different from dev:
-#   - Redis runs INSIDE Docker (redis-cache service)
-#   - App connects to Redis via Docker service name (redis-cache)
-#   - No host port exposed for Redis (not needed externally)
-#   - app depends_on redis-cache with health check
-#   - Prisma migrate runs via entrypoint.sh (NOT at build time)
-#   - Uses Aiven PG for now (swap DATABASE_URL in .env for RDS later)
-# ============================================================
-
+  
 version: "3.8"
 
 services:
 
-  # ── Redis (internal to Docker network — ultra fast) ─────────────────────
   redis-cache:
     image: redis:7-alpine
     container_name: newsglance-redis
-    # No external port binding — only the app container needs Redis
     expose:
       - "6379"
     command:
@@ -38,11 +25,10 @@ services:
       retries: 5
       start_period: 10s
 
-  # ── API Application ──────────────────────────────────────────────────────
   app:
     build:
       context: .
-      dockerfile: Dockerfile   # on EC2 this IS the Ec2-Dockerfile (renamed)
+      dockerfile: Dockerfile
     container_name: newsglance-api
 
     ports:
@@ -51,7 +37,7 @@ services:
     environment:
       NODE_ENV: production
       DATABASE_URL: ${DATABASE_URL}
-      REDIS_URL: redis://altonix:123456@redis-cache:6379   # ← Docker service name
+      REDIS_URL: redis://altonix:123456@redis-cache:6379
       JWT_SECRET_KEY: ${JWT_SECRET_KEY}
       FRONTEND_URL: ${FRONTEND_URL}
       GUARDIAN_API_KEY: ${GUARDIAN_API_KEY}
@@ -78,7 +64,7 @@ services:
 
     depends_on:
       redis-cache:
-        condition: service_healthy   # wait for Redis to be ready
+        condition: service_healthy
 
     restart: unless-stopped
 
@@ -93,7 +79,7 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
-      start_period: 40s    # give extra time for migrations to finish
+      start_period: 40s
 
 volumes:
   redis_data:
