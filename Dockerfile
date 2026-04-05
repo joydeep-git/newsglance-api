@@ -25,7 +25,7 @@ COPY --from=deps /app/node_modules ./node_modules
 
 COPY . .
 
-RUN pnpm prisma migrate dev --"ec2 deploy"
+RUN pnpm prisma migrate deploy
 
 RUN pnpm prisma generate
 
