@@ -1,5 +1,5 @@
-import paymentControllers from "@/controllers/payment-controllers";
-import authToken from "@/middleware/auth-token";
+import paymentControllers from "../controllers/payment-controllers";
+import authToken from "../middleware/auth-token";
 import express, { Router } from "express";
 
 

@@ -1,4 +1,4 @@
-import { errorPrinter } from '@/errors/error-responder';
+import { errorPrinter } from '../../errors/error-responder';
 import dotenv from 'dotenv';
 import Redis from "ioredis";
 

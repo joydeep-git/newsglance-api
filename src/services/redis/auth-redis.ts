@@ -1,7 +1,7 @@
 import Redis from "ioredis";
-import { OtpType, UserDataType } from "@/types/auth";
-import redisService from "@/services/redis/redis";
-import filesQueries from "@/prisma-utils/files-queries";
+import { OtpType, UserDataType } from "../../types/auth";
+import redisService from "../../services/redis/redis";
+import filesQueries from "../../prisma-utils/files-queries";
 
 class AuthRedis {
 

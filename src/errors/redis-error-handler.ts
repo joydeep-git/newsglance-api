@@ -1,6 +1,6 @@
-import ErrorHandler from "@/errors/error-handler";
-import { StatusCode } from "@/types";
-import { errorPrinter } from "@/errors/error-responder";
+import ErrorHandler from "./error-handler";
+import { StatusCode } from "../types";
+import { errorPrinter } from "./error-responder";
 
 const redisErrorHandler = (err: any): ErrorHandler => {
 

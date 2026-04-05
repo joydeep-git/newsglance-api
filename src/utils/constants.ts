@@ -1,4 +1,4 @@
-import { CountryMapType } from "@/types";
+import { CountryMapType } from "../types";
 
 export const defaultAvatarUrl: string = process.env.DEFAULT_AVATAR!;
 

@@ -1,10 +1,10 @@
 import { NextFunction, Request, Response } from "express";
-import { errorPrinter, errRes, errRouter } from "@/errors/error-responder";
-import { StatusCode } from "@/types/index";
-import userQueries from "@/prisma-utils/user-queries";
-import cloudStorage from "@/services/aws/s3";
-import authRedis from "@/services/redis/auth-redis";
-import { UserDataType } from "@/types/auth";
+import { errorPrinter, errRes, errRouter } from "../errors/error-responder";
+import { StatusCode } from "../types/index";
+import userQueries from "../prisma-utils/user-queries";
+import cloudStorage from "../services/aws/s3";
+import authRedis from "../services/redis/auth-redis";
+import { UserDataType } from "../types/auth";
 
 class UserControllers {
 

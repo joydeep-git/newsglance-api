@@ -1,6 +1,6 @@
 import axios from "axios";
-import { GuardianCardResponseType, GuardianSingleNewsResponse, GuardianArticle_Card, ArticleCard, ArticleDetail, NewsResponse, HomeResponse } from "@/types/news";
-import { validSections, guardianCountryTagMap } from "@/utils/constants";
+import { GuardianCardResponseType, GuardianSingleNewsResponse, GuardianArticle_Card, ArticleCard, ArticleDetail, NewsResponse, HomeResponse } from "../../types/news";
+import { validSections, guardianCountryTagMap } from "../../utils/constants";
 
 
 const HOME_FINANCE_SECTION = "money";

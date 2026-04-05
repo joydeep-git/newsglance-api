@@ -1,7 +1,7 @@
 import express , { Router } from "express";
-import userControllers from "@/controllers/user-controllers";
-import authToken from "@/middleware/auth-token";
-import multerConfig from "@/middleware/multer-config";
+import userControllers from "../controllers/user-controllers";
+import authToken from "../middleware/auth-token";
+import multerConfig from "../middleware/multer-config";
 
 
 class UserRouters {

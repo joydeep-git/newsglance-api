@@ -1,5 +1,5 @@
-import db from "@/prisma-utils/db-client";
-import { BookmarkType, NewsDataPropsType } from "@/types/news";
+import db from "../../prisma-utils/db-client";
+import { BookmarkType, NewsDataPropsType } from "../../types/news";
 
 
 class NewsDb {

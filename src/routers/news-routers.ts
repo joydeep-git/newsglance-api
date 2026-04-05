@@ -1,5 +1,5 @@
-import newsController from "@/controllers/news-controllers";
-import authToken from "@/middleware/auth-token";
+import newsController from "../controllers/news-controllers";
+import authToken from "../middleware/auth-token";
 import express , { Router } from "express";
 
 
