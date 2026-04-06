@@ -79,7 +79,10 @@ class Server {
 
     this.app.use(
       cors({
-        origin: ['http://localhost:3000', 'https://newsglance.vercel.app'],
+        origin: [
+          'http://localhost:3000',
+          'https://newsglance.vercel.app',
+        ],
         methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
         credentials: true,
         optionsSuccessStatus: 204
