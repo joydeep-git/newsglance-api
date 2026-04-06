@@ -18,10 +18,11 @@ class AuthToken {
   }
 
   public cookieConfig(days: number = 3): TokenCreateResponseType {
+    const isProduction = process.env.NODE_ENV === "production";
     return {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
+      secure: isProduction,
+      sameSite: isProduction ? "none" : "lax",
       maxAge: 24 * 60 * 60 * 1000 * days, // 72hr
     }
   }
@@ -31,11 +32,7 @@ class AuthToken {
 
     try {
 
-      // getting TOKEN from headers
-
-      // const token: string = req.cookies.token || req.headers.cookie?.split("=")[1] || req.headers.authorization?.split(" ")[1];
-
-      const token = req.cookies.token;
+      const token: string = req.cookies?.token || (req.headers.authorization?.startsWith("Bearer ") ? req.headers.authorization.split(" ")[1] : "");
 
       if (!token) return next(errRes("No Active Session! Please Login!", StatusCode.UNAUTHORIZED));
 
