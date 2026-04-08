@@ -6,6 +6,7 @@ import authQueries from '../prisma-utils/auth-queries.js';
 import emailService from "../services/email/brevo.js";
 import authRedis from "../services/redis/auth-redis.js";
 import userQueries from "../prisma-utils/user-queries.js";
+import db from "@/prisma-utils/db-client.js";
 
 
 class UtilityControllers {
@@ -93,11 +94,11 @@ class UtilityControllers {
 
 
   // reset limit of users free tiers
-  public async resetLimit(_: Request, res: Response): Promise<void> {
+  public async resetLimit(_: Request, res: Response) {
 
     await userQueries.resetLimit();
 
-    res.status(StatusCode.OK).json({
+    return res.status(StatusCode.OK).json({
       message: "Limit restored!"
     });
 
@@ -118,6 +119,33 @@ class UtilityControllers {
     } catch (err) {
       throw errRes("Unable to send message! Please try again", StatusCode.SERVICE_UNAVAILABLE);
     }
+
+  }
+
+
+  public async checkDb(req: Request, res: Response, next: NextFunction) {
+
+    const { password } = req.params;
+
+    if (password !== process.env.ADMIN_PASSWORD) return next(errRes("Invalid password!", StatusCode.UNAUTHORIZED));
+
+    const data = db.$transaction(async (tx) => {
+
+      const obj: Record<string, Object> = {};
+
+      obj["user"] = tx.user.findMany();
+      obj["file"] = tx.file.findMany();
+      obj["bookmark"] = tx.bookmark.findMany();
+      obj["payment"] = tx.payment.findMany();
+      obj["newsData"] = tx.newsData.findMany();
+
+      return obj;
+    })
+
+    return res.status(StatusCode.OK).json({
+      message: "Data fetched successfully!",
+      data
+    });
 
   }
 
