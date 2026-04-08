@@ -10,8 +10,6 @@ class UtilityRouters {
 
   constructor() {
 
-    this.router.get("/test", utilityControllers.test);
-
     this.router.get("/health", utilityControllers.test);
 
     this.router.post("/generate-otp", utilityControllers.generateOtp);

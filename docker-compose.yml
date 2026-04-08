@@ -1,18 +1,39 @@
-version: "3.8"
-
 services:
+  redis-cache:
+    image: redis:7-alpine
+    container_name: newsglance-redis
+    expose:
+      - "6379"
+    command:
+      [
+        "redis-server",
+        "--user", "altonix", "on", ">123456", "~*", "+@all",
+        "--save", "60", "1",
+        "--loglevel", "warning"
+      ]
+    restart: unless-stopped
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "-u", "redis://altonix:123456@localhost:6379", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
   app:
-    build: .
-
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        DATABASE_URL: ${DATABASE_URL}
     container_name: newsglance-api
-
     ports:
       - "5000:5000"
-
     environment:
       NODE_ENV: production
       DATABASE_URL: ${DATABASE_URL}
-      REDIS_URL: ${REDIS_URL}
+      REDIS_URL: redis://altonix:123456@redis-cache:6379
       JWT_SECRET_KEY: ${JWT_SECRET_KEY}
       FRONTEND_URL: ${FRONTEND_URL}
       GUARDIAN_API_KEY: ${GUARDIAN_API_KEY}
@@ -36,35 +57,22 @@ services:
       CASHFREE_SECRET_KEY: ${CASHFREE_SECRET_KEY}
       FUEL_PRICE_API: ${FUEL_PRICE_API}
       FUEL_PRICE_URL: ${FUEL_PRICE_URL}
-
+    depends_on:
+      redis-cache:
+        condition: service_healthy
     restart: unless-stopped
-
     healthcheck:
       test:
         [
           "CMD",
           "node",
           "--eval",
-          "fetch('http://localhost:5000/api/health').then(r=>{if(r.status!==200)process.exit(1)}).catch(()=>process.exit(1))",
+          "fetch('http://localhost:5000/api/health').then(r=>{if(r.status!==200)process.exit(1)}).catch(()=>process.exit(1))"
         ]
-
       interval: 30s
-
-      timeout: 5s
-
+      timeout: 10s
       retries: 3
-
-      start_period: 20s
-
-  redis-cache:
-    image: redis:7-alpine
-    container_name: newsglance-redis
-    ports:
-      - "7341:6379"
-    command: ["redis-server", "--user", "altonix", "on", ">123456", "~*", "+@all"]
-    restart: unless-stopped
-    volumes:
-      - redis_data:/data
+      start_period: 40s
 
 volumes:
   redis_data:
