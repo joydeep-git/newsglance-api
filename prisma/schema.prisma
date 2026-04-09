@@ -20,6 +20,9 @@ model User {
   newsBalance    Int       @default(2)
   audioBalance   Int       @default(2)
 
+  isGoogle       Boolean @default(false)
+  isNumVerified  Boolean @default(true)
+
   defaultCountry String
 
   comments Comment[]
