@@ -38,19 +38,14 @@ const authQueries = {
 
     try {
 
-      const { username, email, name, password, avatarId, defaultCountry, phoneNumber } = req.body;
+      const { password } = req.body;
 
       const hashedPassword = await argon2.hash(password);
 
       const user: UserDataType = await db.user.create({
         data: {
-          name,
-          username,
-          email,
+          ...req.body,
           password: hashedPassword,
-          defaultCountry,
-          phoneNumber,
-          avatarId,
         },
         omit: {
           password: !getPassword
@@ -73,33 +68,29 @@ const authQueries = {
   },
 
 
-  async updateSingleValue({ identifier, field, value, getPassword = false }: {
-    field: keyof UserDataType;
-    value: string;
-    identifier: string;
-    getPassword?: boolean;
-  }) {
+  async updateForgetPassword({ email, newPassword }: {
+    email: string;
+    newPassword: string;
+  }): Promise<UserDataType> {
 
     try {
 
-      if (field === "password") {
-        value = await argon2.hash(value);
-      }
+      const hashedPassword = await argon2.hash(newPassword);
 
       return await db.user.update({
         where: {
-          email: identifier
+          email,
         },
         data: {
-          [field]: value
+          password: hashedPassword
         },
         omit: {
-          password: !getPassword
+          password: true,
         },
         include: {
           avatar: true,
         }
-      })
+      }) as UserDataType;
 
     } catch (err) {
       throw errRouter(err);

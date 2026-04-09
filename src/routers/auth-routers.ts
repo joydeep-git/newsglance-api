@@ -41,6 +41,8 @@ class AuthRouters {
 
     this.router.post("/google/authorize", authGoogleController.authorize);
 
+    this.router.post("/google/update", authToken.validator, authGoogleController.updateGoogleAuthData);
+
   }
 
 

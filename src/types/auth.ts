@@ -17,6 +17,8 @@ export type UserDataType = {
   defaultCountry: string;
   createdAt: Date;
   updatedAt: Date;
+  isNumVerified: boolean;
+  isGoogle: boolean;
 }
 
 
