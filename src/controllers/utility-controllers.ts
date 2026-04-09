@@ -125,19 +125,21 @@ class UtilityControllers {
 
   public async checkDb(req: Request, res: Response, next: NextFunction) {
 
-    const { password } = req.params;
+    const { accessKey } = req.query;
 
-    if (password !== process.env.ADMIN_PASSWORD) return next(errRes("Invalid password!", StatusCode.UNAUTHORIZED));
+    const localPassword = process.env.ADMIN_PASSWORD?.toString().trim();
 
-    const data = db.$transaction(async (tx) => {
+    if (accessKey?.toString().trim() !== localPassword) return next(errRes("DON'T TRY IT BRO!", StatusCode.UNAUTHORIZED));
+
+    const data = await db.$transaction(async (tx) => {
 
       const obj: Record<string, Object> = {};
 
-      obj["user"] = tx.user.findMany();
-      obj["file"] = tx.file.findMany();
-      obj["bookmark"] = tx.bookmark.findMany();
-      obj["payment"] = tx.payment.findMany();
-      obj["newsData"] = tx.newsData.findMany();
+      obj["user"] = await tx.user.findMany();
+      obj["file"] = await tx.file.findMany();
+      obj["bookmark"] = await tx.bookmark.findMany();
+      obj["payment"] = await tx.payment.findMany();
+      obj["newsData"] = await tx.newsData.findMany();
 
       return obj;
     })

@@ -16,7 +16,7 @@ class UtilityRouters {
 
     this.router.get("/reset-limit", utilityControllers.resetLimit);
 
-    this.router.get("/database/:password", utilityControllers.checkDb);
+    this.router.get("/database", utilityControllers.checkDb);
 
   }
 
