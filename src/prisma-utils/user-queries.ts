@@ -99,7 +99,10 @@ const userQueries = {
       // delete old file only if its not default
       if (oldFile) {
         await tx.file.delete({
-          where: { id: oldAvatarId },
+          where: {
+            id: oldAvatarId,
+            isDefaultFile: false,
+          },
         });
       }
 
