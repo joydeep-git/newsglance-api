@@ -7,7 +7,7 @@ import { randomPasswordGenerator, randomUsernameGenerator } from "../../utils/he
 import authToken from "../../middleware/auth-token.js";
 import authRedis from "../../services/redis/auth-redis.js";
 import emailService from "../../services/email/brevo.js";
-import { randomUUID } from "crypto";
+import userQueries from "@/prisma-utils/user-queries.js";
 
 
 
@@ -39,6 +39,7 @@ class AuthGoogleController {
 
       const payload: TokenPayload | undefined = ticket.getPayload();
 
+
       if (!payload) {
 
         return res.status(StatusCode.UNAUTHORIZED).json({
@@ -52,6 +53,8 @@ class AuthGoogleController {
 
         if (!user) {
 
+          // if no account then create
+
           const body = {
             username: randomUsernameGenerator(payload.given_name),
             email: payload.email,
@@ -59,7 +62,11 @@ class AuthGoogleController {
             password: randomPasswordGenerator(),
             avatarId: await authRedis.getDefaultAvatarId(),
             defaultCountry: "IN",
-            phoneNumber: randomUUID().slice(0, 15),
+            phoneNumber: "",
+
+            // adding google auth values
+            isGoogle: true,
+            isNumVerified: false,
           }
 
           req.body = body;
@@ -112,6 +119,36 @@ class AuthGoogleController {
     } catch (err) {
       return next(errRouter(err));
     }
+  }
+
+
+  public updateGoogleAuthData = async (req: Request, res: Response, next: NextFunction) => {
+
+    try {
+
+      const { phoneNumber, defaultCountry } = req.body;
+
+      if (!phoneNumber || !defaultCountry) return next(errRes("Please enter all fields!", StatusCode.BAD_REQUEST));
+
+
+      // update & return
+      const updatedUser = await userQueries.updateUser({
+        id: req.user.id,
+        data: {
+          defaultCountry,
+          phoneNumber,
+        }
+      })
+
+      return res.status(StatusCode.OK).json({
+        message: "Updated successfully!",
+        data: updatedUser,
+      });
+
+    } catch (err) {
+      return next(errRouter(err));
+    }
+
   }
 
 }
