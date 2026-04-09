@@ -65,6 +65,19 @@ export const otpGenerator = (): string => {
 
 
 
+export const planExpiryCalculator = (): Date => {
+
+  const expiry = new Date();
+
+  expiry.setMonth(expiry.getMonth() + 1);
+
+  expiry.setHours(23, 59, 59, 999);
+
+  return expiry;
+}
+
+
+
 export const randomUsernameGenerator = (name?: string): string => {
 
   const baseName: string = name?.trim().toLowerCase() ?? "User_";
