@@ -1,6 +1,7 @@
 import { DeleteObjectCommand, HeadObjectCommand, HeadObjectCommandOutput, PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import { randomUUID } from "node:crypto";
 import { errRouter } from "../../errors/error-responder.js";
+import { defaultAvatarUrl } from "@/utils/constants.js";
 
 
 class CloudStorage {
@@ -10,8 +11,6 @@ class CloudStorage {
   private bucketName: string = process.env.S3_BUCKET_NAME!;
 
   private region: string = process.env.AWS_REGION!;
-
-  private defaultImageUrl: string = process.env.DEFAULT_AVATAR!
 
   constructor() {
 
@@ -95,7 +94,7 @@ class CloudStorage {
       }
 
 
-      if (this.defaultImageUrl && url === this.defaultImageUrl) return {
+      if (url === defaultAvatarUrl) return {
         deleted: false,
         message: "Default avatar can not be deleted!"
       }
