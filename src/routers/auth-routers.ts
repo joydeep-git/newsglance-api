@@ -47,7 +47,7 @@ class AuthRouters {
   // general auth router
   private generaleAuthRoutes(): void {
 
-    this.router.get("/logout", authGeneralControllers.logout);
+    this.router.get("/logout", authToken.validator, authGeneralControllers.logout);
 
     this.router.delete("/delete", authToken.validator, authGeneralControllers.deleteAccount);
 
