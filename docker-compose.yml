@@ -33,6 +33,7 @@ services:
     environment:
       NODE_ENV: production
       DATABASE_URL: ${DATABASE_URL}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD}
       REDIS_URL: redis://altonix:123456@redis-cache:6379
       JWT_SECRET_KEY: ${JWT_SECRET_KEY}
       FRONTEND_URL: ${FRONTEND_URL}
