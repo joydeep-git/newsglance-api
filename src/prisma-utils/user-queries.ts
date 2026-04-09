@@ -8,7 +8,7 @@ import authRedis from "../services/redis/auth-redis.js";
 const userQueries = {
 
 
-  async updateUser({ id, data }: { id: string; data: Record<string, string | number>; }): Promise<UserDataType> {
+  async updateUser({ id, data }: { id: string; data: Record<string, string | number | boolean>; }): Promise<UserDataType> {
 
     try {
 

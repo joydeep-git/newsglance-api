@@ -62,7 +62,7 @@ class AuthGoogleController {
             password: randomPasswordGenerator(),
             avatarId: await authRedis.getDefaultAvatarId(),
             defaultCountry: "IN",
-            phoneNumber: "",
+            phoneNumber: "+910000000000",
 
             // adding google auth values
             isGoogle: true,
@@ -137,6 +137,7 @@ class AuthGoogleController {
         data: {
           defaultCountry,
           phoneNumber,
+          isNumVerified: true,
         }
       })
 
