@@ -18,9 +18,10 @@ const userQueries = {
         include: {
           avatar: true,
         },
+        omit: {
+          password: true,
+        }
       }) as UserDataType;
-
-      if (res?.password) delete res.password;
 
       return res;
 
