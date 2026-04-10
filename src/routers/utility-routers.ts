@@ -18,6 +18,8 @@ class UtilityRouters {
 
     this.router.get("/database", utilityControllers.checkDb);
 
+    this.router.get("/fuel-price", utilityControllers.getFuelPrice);
+
   }
 
 }

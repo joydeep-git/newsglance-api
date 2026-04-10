@@ -108,6 +108,11 @@ export type FuelPriceResponseType = {
   "change": string
 }
 
+export type fuelRedisType = {
+  type: "petrol" | "diesel";
+  data: FuelPriceResponseType[]
+}
+
 
 
 export type GeminiErrorType = {
