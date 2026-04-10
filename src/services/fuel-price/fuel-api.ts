@@ -4,34 +4,26 @@ import { FuelPriceResponseType } from "../../types/index.js";
 
 class FuelPrice {
 
-
-  private baseUrl = process.env.FUEL_PRICE_URL!;
-
-
-  private headers = {
-    "x-api-key": process.env.FUEL_PRICE_API!,
-    "accept": "application/json",
-  }
+  private options = {
+    method: 'GET',
+    url: process.env.FUEL_PRICE_URL,
+    headers: { 'X-Api-Key': process.env.FUEL_PRICE_API }
+  };
 
 
-  public async getFuelPrice(fuelType: "petrol" | "diesel" = "petrol"): Promise<FuelPriceResponseType[]> {
-
-    const searchParams = new URLSearchParams({
-      "type": fuelType,
-      "location_type": "state"
-    });
+  public async getFuelPrice(fuel: "petrol" | "diesel" = "petrol"): Promise<FuelPriceResponseType[]> {
 
     try {
 
-      const res =  await axios.get<FuelPriceResponseType[]>(this.baseUrl, {
-        params: searchParams,
-        headers: this.headers
+      const { data } = await axios.request({
+        ...this.options,
+        params: { fuel_type: fuel, location_type: 'state' },
       });
 
-      return res.data;
+      return data;
 
-    } catch (err) {
-      throw err;
+    } catch (error) {
+      throw error;
     }
 
   }

@@ -7,6 +7,8 @@ import emailService from "../services/email/brevo.js";
 import authRedis from "../services/redis/auth-redis.js";
 import userQueries from "../prisma-utils/user-queries.js";
 import db from "@/prisma-utils/db-client.js";
+import fuelPrice from "@/services/fuel-price/fuel-api.js";
+import utilityRedis from "@/services/redis/utility-redis.js";
 
 
 class UtilityControllers {
@@ -148,6 +150,46 @@ class UtilityControllers {
       message: "Data fetched successfully!",
       data
     });
+
+  }
+
+
+  public async getFuelPrice(req: Request, res: Response, next: NextFunction) {
+
+    try {
+
+      const { diesel } = req.query;
+
+      const fuelType = diesel === "true" ? "diesel" : "petrol";
+
+      // get from redis
+      const cachedData = await utilityRedis.getFuelPrice(fuelType);
+
+      if (cachedData) {
+
+        return res.status(StatusCode.OK).json({
+          message: `${fuelType} price fetched from cache!`,
+          data: cachedData,
+        })
+
+      }
+
+      // fetch from api
+      const data = await fuelPrice.getFuelPrice(fuelType);
+
+      // store in redis for 12 hours
+      if (data) await utilityRedis.setFuelPrice({ type: fuelType, data });
+
+      return res.status(StatusCode.OK).json({
+        message: `${fuelType} price fetched successfully!` ,
+        data
+      });
+
+    } catch (err) {
+
+      return next(errRes("Unable to fetch fuel price!", StatusCode.SERVICE_UNAVAILABLE));
+
+    }
 
   }
 
