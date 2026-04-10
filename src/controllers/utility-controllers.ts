@@ -154,34 +154,31 @@ class UtilityControllers {
   }
 
 
-  public async getFuelPrice(req: Request, res: Response, next: NextFunction) {
+  public async getFuelPrice(_req: Request, res: Response, next: NextFunction) {
 
     try {
 
-      const { diesel } = req.query;
-
-      const fuelType = diesel === "true" ? "diesel" : "petrol";
-
       // get from redis
-      const cachedData = await utilityRedis.getFuelPrice(fuelType);
+      const cachedData = await utilityRedis.getFuelPrice();
 
       if (cachedData) {
 
         return res.status(StatusCode.OK).json({
-          message: `${fuelType} price fetched from cache!`,
+          message: `Fuel price fetched from cache!`,
           data: cachedData,
         })
 
       }
 
+
       // fetch from api
-      const data = await fuelPrice.getFuelPrice(fuelType);
+      const data = await fuelPrice.getFuelPrice();
 
       // store in redis for 12 hours
-      if (data) await utilityRedis.setFuelPrice({ type: fuelType, data });
+      if (data) await utilityRedis.setFuelPrice(data);
 
       return res.status(StatusCode.OK).json({
-        message: `${fuelType} price fetched successfully!` ,
+        message: `Fuel price fetched successfully!` ,
         data
       });
 
