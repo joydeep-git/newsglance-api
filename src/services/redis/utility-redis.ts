@@ -1,6 +1,6 @@
 import { Redis } from "ioredis";
 import redisService from "./redis.js";
-import { FuelPriceResponseType, fuelRedisType } from "@/types/index.js";
+import { FuelCustomResponseType } from "@/types/index.js";
 
 
 class UtilityRedis {
@@ -9,16 +9,16 @@ class UtilityRedis {
   private redis: Redis = redisService.redis;
 
 
-  public async setFuelPrice({ type, data }: fuelRedisType ): Promise<void> {
+  public async setFuelPrice(data: FuelCustomResponseType[]): Promise<void> {
 
-    await this.redis.setex(`fuel:${type}`, 43200, JSON.stringify(data) ); // 12 hr
+    await this.redis.setex("fuel-price", 43200, JSON.stringify(data)); // 12 hr
 
   }
 
 
-  public async getFuelPrice(type: "petrol" | "diesel"): Promise<FuelPriceResponseType[] | null> {
+  public async getFuelPrice(): Promise<FuelCustomResponseType[] | null> {
 
-    const data = await this.redis.get(`fuel:${type}`);
+    const data = await this.redis.get("fuel-price");
 
     if (data) return JSON.parse(data);
 

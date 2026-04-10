@@ -108,9 +108,10 @@ export type FuelPriceResponseType = {
   "change": string
 }
 
-export type fuelRedisType = {
-  type: "petrol" | "diesel";
-  data: FuelPriceResponseType[]
+export type FuelCustomResponseType = {
+  "state": string;
+  "petrol": string;
+  "diesel": string;
 }
 
 

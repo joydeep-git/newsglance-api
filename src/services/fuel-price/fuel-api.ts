@@ -1,5 +1,5 @@
 import axios from "axios";
-import { FuelPriceResponseType } from "../../types/index.js";
+import { FuelCustomResponseType, FuelPriceResponseType } from "../../types/index.js";
 
 
 class FuelPrice {
@@ -11,16 +11,50 @@ class FuelPrice {
   };
 
 
-  public async getFuelPrice(fuel: "petrol" | "diesel" = "petrol"): Promise<FuelPriceResponseType[]> {
+  public async getFuelPrice(): Promise<FuelCustomResponseType[]> {
 
     try {
 
-      const { data } = await axios.request({
-        ...this.options,
-        params: { fuel_type: fuel, location_type: 'state' },
-      });
+      const [petrol, diesel] = await Promise.all([
 
-      return data;
+        axios.request<FuelPriceResponseType[]>({
+          ...this.options,
+          params: { fuel_type: "petrol", location_type: 'state' },
+        }),
+
+        axios.request<FuelPriceResponseType[]>({
+          ...this.options,
+          params: { fuel_type: "diesel", location_type: 'state' },
+        }),
+
+      ]);
+
+
+      // store petrol in map
+      const data: Map<string, FuelCustomResponseType> = new Map(
+        petrol.data.map(item => [item.city, {
+          petrol: item.price,
+          state: item.city,
+          diesel: "N/A"
+        }]));
+
+
+      // add diesel
+      diesel.data.forEach(item => {
+
+        const stateData = data.get(item.city);
+
+        if (stateData) {
+          data.set(stateData.state, {
+            ...stateData,
+            diesel: item.price,
+          })
+        }
+
+      })
+
+
+      return Array.from(data.values());
 
     } catch (error) {
       throw error;
