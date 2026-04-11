@@ -141,6 +141,9 @@ class AuthGoogleController {
         }
       })
 
+      // update redis
+      await authRedis.setUserData(updatedUser);
+
       return res.status(StatusCode.OK).json({
         message: "Updated successfully!",
         data: updatedUser,
