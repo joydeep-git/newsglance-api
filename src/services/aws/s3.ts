@@ -1,10 +1,11 @@
 import { DeleteObjectCommand, HeadObjectCommand, HeadObjectCommandOutput, PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import { randomUUID } from "node:crypto";
 import { errRouter } from "../../errors/error-responder.js";
-import { defaultAvatarUrl } from "@/utils/constants.js";
 
 
 class CloudStorage {
+
+  private defaultAvatar: string = "https://newsglance-s3.s3.ap-south-1.amazonaws.com/default.jpg";
 
   private client: S3Client;
 
@@ -94,7 +95,7 @@ class CloudStorage {
       }
 
 
-      if (url === defaultAvatarUrl) return {
+      if (url === this.defaultAvatar) return {
         deleted: false,
         message: "Default avatar can not be deleted!"
       }
