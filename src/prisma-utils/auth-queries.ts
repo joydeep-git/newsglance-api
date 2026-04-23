@@ -38,13 +38,18 @@ const authQueries = {
 
     try {
 
-      const { password } = req.body;
+      const { username, email, name, phoneNumber, avatarId, defaultCountry, password } = req.body;
 
       const hashedPassword = await argon2.hash(password);
 
       const user: UserDataType = await db.user.create({
         data: {
-          ...req.body,
+          username,
+          name,
+          email,
+          phoneNumber,
+          avatarId,
+          defaultCountry,
           password: hashedPassword,
         },
         omit: {
