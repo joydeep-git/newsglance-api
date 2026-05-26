@@ -26,6 +26,7 @@
 | 🌐 **Live App**         | [newsglance.vercel.app](https://newsglance.vercel.app)                                 |
 | 🖥️ **Web Repository**   | [github.com/joydeep-git/newsglance-web](https://github.com/joydeep-git/newsglance-web) |
 | ☁️ **EC2 + CloudFront** | [d3g4hp7x5o3v7g.cloudfront.net](https://d3g4hp7x5o3v7g.cloudfront.net)                 |
+| ☁️ **YouTube Video** | [d3g4hp7x5o3v7g.cloudfront.net](https://d3g4hp7x5o3v7g.cloudfront.net)                    |
 
 <br/>
 
