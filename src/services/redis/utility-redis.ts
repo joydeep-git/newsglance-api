@@ -11,7 +11,7 @@ class UtilityRedis {
 
   public async setFuelPrice(data: FuelCustomResponseType[]): Promise<void> {
 
-    await this.redis.setex("fuel-price", 43200, JSON.stringify(data)); // 12 hr
+    await this.redis.set("fuel-price", JSON.stringify(data)); // lifetime bcz if api fails it will stay
 
   }
 

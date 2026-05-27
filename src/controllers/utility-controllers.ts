@@ -159,32 +159,57 @@ class UtilityControllers {
     try {
 
       // get from redis
-      const cachedData = await utilityRedis.getFuelPrice();
-
-      if (cachedData) {
-
-        return res.status(StatusCode.OK).json({
-          message: `Fuel price fetched from cache!`,
-          data: cachedData,
-        })
-
-      }
-
-
-      // fetch from api
-      const data = await fuelPrice.getFuelPrice();
-
-      // store in redis for 12 hours
-      if (data) await utilityRedis.setFuelPrice(data);
+      const fuelPrice = await utilityRedis.getFuelPrice();
 
       return res.status(StatusCode.OK).json({
-        message: `Fuel price fetched successfully!` ,
-        data
+        message: `Fuel price fetched successfully!`,
+        data: fuelPrice
       });
 
     } catch (err) {
 
       return next(errRes("Unable to fetch fuel price!", StatusCode.SERVICE_UNAVAILABLE));
+
+    }
+
+  }
+
+
+  public async setFuelPrice(req: Request, res: Response, next: NextFunction) {
+
+    try {
+
+      const { accesskey } = req.query;
+
+      if (!accesskey || accesskey !== String(process.env.FUEL_PRICE_ACCESS_KEY?.trim())) {
+
+        return res.status(StatusCode.UNAUTHORIZED).json({
+          message: "Invalid Access Key! Please verify youself first."
+        })
+
+      }
+
+      // fetch from api
+      const data = await fuelPrice.getFuelPrice();
+
+      if (data) {
+
+        await utilityRedis.setFuelPrice(data);
+
+        return res.status(StatusCode.OK).json({
+          message: "Fuel price updated!",
+          data,
+        });
+
+      } else {
+
+        return next(errRes("Failed to update fuel price!", StatusCode.BAD_REQUEST));
+
+      }
+
+    } catch (err) {
+
+      return next(errRouter(err));
 
     }
 
