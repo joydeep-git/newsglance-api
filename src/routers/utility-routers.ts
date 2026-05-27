@@ -20,6 +20,8 @@ class UtilityRouters {
 
     this.router.get("/fuel-price", utilityControllers.getFuelPrice);
 
+    this.router.get("/set-fuel-price", utilityControllers.setFuelPrice);
+
   }
 
 }
