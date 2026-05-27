@@ -58,6 +58,7 @@ services:
       CASHFREE_SECRET_KEY: ${CASHFREE_SECRET_KEY}
       FUEL_PRICE_API: ${FUEL_PRICE_API}
       FUEL_PRICE_URL: ${FUEL_PRICE_URL}
+      FUEL_PRICE_ACCESS_KEY: ${FUEL_PRICE_ACCESS_KEY}
     depends_on:
       redis-cache:
         condition: service_healthy
