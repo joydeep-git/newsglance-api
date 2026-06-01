@@ -55,27 +55,28 @@
 ```
 ┌────────────────────────────────────────┐
 │           newsglance-web               │
-│    Next.js 15 · React 19 · Vercel     │
+│    Next.js · Redux . Framer Motion     |
+│    Typescript, Tailwind CSS            | 
 └─────────────────┬──────────────────────┘
                   │  HTTPS · httpOnly Cookie
                   ▼
 ┌────────────────────────────────────────┐
 │        AWS CloudFront (HTTPS)          │
-│   d3g4hp7x5o3v7g.cloudfront.net       │
+│   d3g4hp7x5o3v7g.cloudfront.net        │
 └─────────────────┬──────────────────────┘
                   │
                   ▼
 ┌────────────────────────────────────────┐
 │           newsglance-api               │
-│    Express · TypeScript · AWS EC2     │
+│    Express · TypeScript · AWS EC2      │
 │                                        │
-│   Auth · News · User · Payment        │
-│   Rate Limiting · CORS · Helmet       │
+│   Auth · News · User · Payment         │
+│   Rate Limiting · CORS · Helmet        │
 └──────┬──────────┬──────────┬───────────┘
        │          │          │
        ▼          ▼          ▼
   PostgreSQL    Redis      AWS Cloud
-  (Prisma)     Cache     S3 · Polly · Gemini
+  (Prisma)     Cache     S3 · Polly · RDS
 ```
 
 ---
