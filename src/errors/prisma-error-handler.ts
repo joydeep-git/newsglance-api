@@ -8,7 +8,7 @@ import { Prisma } from "../generated/prisma/client.js";
 const prismaErrorHandler = (err: unknown): ErrorHandler => {
 
 
-  errorPrinter("################################################ \n Prisma Error", err);
+  errorPrinter("Prisma Error", err);
 
 
   if (err instanceof Prisma.PrismaClientKnownRequestError) {
