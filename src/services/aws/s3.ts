@@ -5,7 +5,7 @@ import { errRouter } from "../../errors/error-responder.js";
 
 class CloudStorage {
 
-  private defaultAvatar: string = "https://newsglance-s3.s3.ap-south-1.amazonaws.com/default.jpg";
+  private defaultAvatar: string = process.env.DEFAULT_AVATAR!;
 
   private client: S3Client;
 
