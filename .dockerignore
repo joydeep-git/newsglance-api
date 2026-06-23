@@ -12,7 +12,6 @@ README.md
 .env.production.local
 .nyc_output
 coverage
-.vscode
 .idea
 *.log
 .DS_Store
@@ -25,3 +24,6 @@ build
 .parcel-cache
 .tmp
 .temp
+.vscode
+.idea
+.fleet
