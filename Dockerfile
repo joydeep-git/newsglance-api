@@ -9,11 +9,10 @@ RUN corepack enable
 
 WORKDIR /app
 
-
 # Stage 2: Dependencies
 FROM base AS deps
 
-COPY pnpm-lock.yaml package.json ./
+COPY pnpm-lock.yaml package.json pnpm-workspace.yaml ./
 
 RUN pnpm install --frozen-lockfile
 

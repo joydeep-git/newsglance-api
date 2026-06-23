@@ -22,7 +22,7 @@ import prismaSeeding from "./prisma-utils/prisma-seeding.js";
 
 class Server {
 
-  private app: Application;
+  private readonly app: Application;
 
   private readonly port: number;
 
@@ -79,10 +79,7 @@ class Server {
 
     this.app.use(
       cors({
-        origin: [
-          'http://localhost:3000',
-          'https://newsglance.vercel.app',
-        ],
+        origin: [ process.env.LOCAL_FRONTEND_URL!, process.env.FRONTEND_URL!, ],
         methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
         credentials: true,
         optionsSuccessStatus: 204

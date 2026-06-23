@@ -19,12 +19,14 @@ class AuthGeneralControllers {
 
       const { token } = req;
 
-      res.clearCookie("token").status(StatusCode.OK).json({
+      await authRedis.setBlacklistedToken(token);
+
+      await authRedis.deleteUserData(req.user.id);
+
+      return res.clearCookie("token").status(StatusCode.OK).json({
         message: "Logged Out!",
         statusCode: StatusCode.OK
       });
-
-      await authRedis.setBlacklistedToken(token);
 
     } catch (err) {
       return next(errRouter(err));

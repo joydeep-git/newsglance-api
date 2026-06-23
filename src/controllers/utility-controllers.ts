@@ -6,6 +6,9 @@ import authQueries from '../prisma-utils/auth-queries.js';
 import emailService from "../services/email/brevo.js";
 import authRedis from "../services/redis/auth-redis.js";
 import userQueries from "../prisma-utils/user-queries.js";
+import db from "@/prisma-utils/db-client.js";
+import fuelPrice from "@/services/fuel-price/fuel-api.js";
+import utilityRedis from "@/services/redis/utility-redis.js";
 
 
 class UtilityControllers {
@@ -93,11 +96,11 @@ class UtilityControllers {
 
 
   // reset limit of users free tiers
-  public async resetLimit(_: Request, res: Response): Promise<void> {
+  public async resetLimit(_: Request, res: Response) {
 
     await userQueries.resetLimit();
 
-    res.status(StatusCode.OK).json({
+    return res.status(StatusCode.OK).json({
       message: "Limit restored!"
     });
 
@@ -117,6 +120,97 @@ class UtilityControllers {
 
     } catch (err) {
       throw errRes("Unable to send message! Please try again", StatusCode.SERVICE_UNAVAILABLE);
+    }
+
+  }
+
+
+  public async checkDb(req: Request, res: Response, next: NextFunction) {
+
+    const { accessKey } = req.query;
+
+    const localPassword = process.env.ADMIN_PASSWORD?.toString().trim();
+
+    if (accessKey?.toString().trim() !== localPassword) return next(errRes("DON'T TRY IT BRO!", StatusCode.UNAUTHORIZED));
+
+    const data = await db.$transaction(async (tx) => {
+
+      const obj: Record<string, Object> = {};
+
+      obj["user"] = await tx.user.findMany();
+      obj["file"] = await tx.file.findMany();
+      obj["bookmark"] = await tx.bookmark.findMany();
+      obj["payment"] = await tx.payment.findMany();
+      obj["newsData"] = await tx.newsData.findMany();
+
+      return obj;
+    })
+
+    return res.status(StatusCode.OK).json({
+      message: "Data fetched successfully!",
+      data
+    });
+
+  }
+
+
+  public async getFuelPrice(_req: Request, res: Response, next: NextFunction) {
+
+    try {
+
+      // get from redis
+      const fuelPrice = await utilityRedis.getFuelPrice();
+
+      return res.status(StatusCode.OK).json({
+        message: `Fuel price fetched successfully!`,
+        data: fuelPrice
+      });
+
+    } catch (err) {
+
+      return next(errRes("Unable to fetch fuel price!", StatusCode.SERVICE_UNAVAILABLE));
+
+    }
+
+  }
+
+
+  public async setFuelPrice(req: Request, res: Response, next: NextFunction) {
+
+    try {
+
+      const { accesskey } = req.query;
+
+      if (!accesskey || accesskey !== String(process.env.FUEL_PRICE_ACCESS_KEY?.trim())) {
+
+        return res.status(StatusCode.UNAUTHORIZED).json({
+          message: "Invalid Access Key! Please verify youself first."
+        })
+
+      }
+
+      // fetch from api
+      const data = await fuelPrice.getFuelPrice();
+
+      if (data) {
+
+        await utilityRedis.setFuelPrice(data);
+
+        return res.status(StatusCode.OK).json({
+          message: "Fuel price updated!",
+          data,
+        });
+
+      } else {
+
+        return next(errRes("Failed to update fuel price!", StatusCode.BAD_REQUEST));
+
+      }
+
+    } catch (err) {
+
+      return next(errRouter(err));
+
     }
 
   }

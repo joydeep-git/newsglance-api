@@ -2,6 +2,7 @@
 import { UserDataType } from "../types/auth.js";
 import db from "./db-client.js";
 import { CreatePaymentRecordType, PaymentDataType } from "../types/payment.js";
+import { planExpiryCalculator } from "@/utils/helpers.js";
 
 
 
@@ -45,7 +46,7 @@ const paymentQueries = {
         },
         data: {
           isPremium: true,
-          planExpiryDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days from today
+          planExpiryDate: planExpiryCalculator(), // 1 month till midnight from today
         },
         include: {
           avatar: true,

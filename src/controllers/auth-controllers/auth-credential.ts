@@ -180,19 +180,21 @@ class AuthCredentialControllers {
 
 
       // update user password
-      const isUpdated = await authQueries.updateSingleValue({ identifier: email, field: "password", value: password });
+      const isUpdated = await authQueries.updateForgetPassword({
+        email,
+        newPassword: password
+      });
 
       if (isUpdated) {
 
         res.status(StatusCode.OK).json({
-          message: "Password Changed!"
+          message: "Password Changed!",
         });
 
 
         // delete remaining redis cache
         await authRedis.deleteOtp({ email, type: "forget-password" });
         await authRedis.deletePasswordReset({ email, otp });
-
 
       } else {
 

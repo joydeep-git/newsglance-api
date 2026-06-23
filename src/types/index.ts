@@ -108,6 +108,12 @@ export type FuelPriceResponseType = {
   "change": string
 }
 
+export type FuelCustomResponseType = {
+  "state": string;
+  "petrol": string;
+  "diesel": string;
+}
+
 
 
 export type GeminiErrorType = {

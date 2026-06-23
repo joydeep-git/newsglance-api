@@ -8,7 +8,7 @@ import authRedis from "../services/redis/auth-redis.js";
 const userQueries = {
 
 
-  async updateUser({ id, data }: { id: string; data: Record<string, string | number>; }): Promise<UserDataType> {
+  async updateUser({ id, data }: { id: string; data: Record<string, string | number | boolean>; }): Promise<UserDataType> {
 
     try {
 
@@ -18,9 +18,10 @@ const userQueries = {
         include: {
           avatar: true,
         },
+        omit: {
+          password: true,
+        }
       }) as UserDataType;
-
-      if (res?.password) delete res.password;
 
       return res;
 
@@ -98,7 +99,10 @@ const userQueries = {
       // delete old file only if its not default
       if (oldFile) {
         await tx.file.delete({
-          where: { id: oldAvatarId },
+          where: {
+            id: oldAvatarId,
+            isDefaultFile: false,
+          },
         });
       }
 

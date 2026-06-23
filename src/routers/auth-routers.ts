@@ -41,13 +41,15 @@ class AuthRouters {
 
     this.router.post("/google/authorize", authGoogleController.authorize);
 
+    this.router.post("/google/update", authToken.validator, authGoogleController.updateGoogleAuthData);
+
   }
 
 
   // general auth router
   private generaleAuthRoutes(): void {
 
-    this.router.get("/logout", authGeneralControllers.logout);
+    this.router.get("/logout", authToken.validator, authGeneralControllers.logout);
 
     this.router.delete("/delete", authToken.validator, authGeneralControllers.deleteAccount);
 

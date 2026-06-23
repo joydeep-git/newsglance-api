@@ -1,37 +1,63 @@
 import axios from "axios";
-import { FuelPriceResponseType } from "../../types/index.js";
+import { FuelCustomResponseType, FuelPriceResponseType } from "../../types/index.js";
 
 
 class FuelPrice {
 
-
-  private baseUrl = process.env.FUEL_PRICE_URL!;
-
-
-  private headers = {
-    "x-api-key": process.env.FUEL_PRICE_API!,
-    "accept": "application/json",
-  }
+  private options = {
+    method: 'GET',
+    url: process.env.FUEL_PRICE_URL,
+    headers: { 'X-Api-Key': process.env.FUEL_PRICE_API }
+  };
 
 
-  public async getFuelPrice(fuelType: "petrol" | "diesel" = "petrol"): Promise<FuelPriceResponseType[]> {
-
-    const searchParams = new URLSearchParams({
-      "type": fuelType,
-      "location_type": "state"
-    });
+  public async getFuelPrice(): Promise<FuelCustomResponseType[]> {
 
     try {
 
-      const res =  await axios.get<FuelPriceResponseType[]>(this.baseUrl, {
-        params: searchParams,
-        headers: this.headers
-      });
+      const [petrol, diesel] = await Promise.all([
 
-      return res.data;
+        axios.request<FuelPriceResponseType[]>({
+          ...this.options,
+          params: { fuel_type: "petrol", location_type: 'state' },
+        }),
 
-    } catch (err) {
-      throw err;
+        axios.request<FuelPriceResponseType[]>({
+          ...this.options,
+          params: { fuel_type: "diesel", location_type: 'state' },
+        }),
+
+      ]);
+
+
+      // store petrol in map
+      const data: Map<string, FuelCustomResponseType> = new Map(
+        petrol.data.map(item => [item.city, {
+          petrol: item.price,
+          state: item.city,
+          diesel: "N/A"
+        }]));
+
+
+      // add diesel
+      diesel.data.forEach(item => {
+
+        const stateData = data.get(item.city);
+
+        if (stateData) {
+          data.set(stateData.state, {
+            ...stateData,
+            diesel: item.price,
+          })
+        }
+
+      })
+
+
+      return Array.from(data.values());
+
+    } catch (error) {
+      throw error;
     }
 
   }

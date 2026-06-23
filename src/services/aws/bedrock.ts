@@ -4,15 +4,13 @@ import { BedrockRuntimeClient, InvokeModelCommand, InvokeModelCommandOutput } fr
 
 class Bedrock {
 
-  private client: BedrockRuntimeClient;
+  private readonly client: BedrockRuntimeClient;
 
-  private model: string = "amazon.nova-lite-v1:0";
-
-  private region: string = "us-east-1";
+  private model: string = process.env.BEDROCK_MODEL!;
 
   constructor() {
     this.client = new BedrockRuntimeClient({
-      region: this.region,
+      region: process.env.BEDROCK_REGION!,
       credentials: {
         accessKeyId: process.env.BEDROCK_ACCESS_KEY!,
         secretAccessKey: process.env.BEDROCK_SECRET_KEY!,

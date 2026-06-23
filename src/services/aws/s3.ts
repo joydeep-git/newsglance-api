@@ -5,13 +5,13 @@ import { errRouter } from "../../errors/error-responder.js";
 
 class CloudStorage {
 
+  private defaultAvatar: string = process.env.DEFAULT_AVATAR!;
+
   private client: S3Client;
 
   private bucketName: string = process.env.S3_BUCKET_NAME!;
 
   private region: string = process.env.AWS_REGION!;
-
-  private defaultImageUrl: string = process.env.DEFAULT_AVATAR!
 
   constructor() {
 
@@ -95,7 +95,7 @@ class CloudStorage {
       }
 
 
-      if (this.defaultImageUrl && url === this.defaultImageUrl) return {
+      if (url === this.defaultAvatar) return {
         deleted: false,
         message: "Default avatar can not be deleted!"
       }

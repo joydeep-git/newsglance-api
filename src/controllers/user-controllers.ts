@@ -72,8 +72,10 @@ class UserControllers {
         // update redis
         await authRedis.setUserData(updatedUser as UserDataType);
 
-        // delete AWS file
-        await cloudStorage.deleteFile(req.user.avatar?.url);
+        // delete AWS file only when old avatar is NOT default
+        if (req.user.avatar?.url && req.user.avatar?.isDefaultFile === false) {
+          await cloudStorage.deleteFile(req.user.avatar.url);
+        }
 
       } catch (err) {
         errorPrinter("Update Avatar cleanup failed!", err);
@@ -108,8 +110,10 @@ class UserControllers {
         // update redis
         await authRedis.setUserData(updatedUser);
 
-        // delete AWS file
-        await cloudStorage.deleteFile(req.user.avatar?.url);
+        // delete AWS file only if the old avatar is NOT a default file
+        if (req.user.avatar?.url && req.user.avatar?.isDefaultFile === false) {
+          await cloudStorage.deleteFile(req.user.avatar.url);
+        }
 
       } catch (err) {
         errorPrinter("Delete Avatar cleanup failed!", err);
