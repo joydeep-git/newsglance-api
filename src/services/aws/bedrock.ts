@@ -1,12 +1,13 @@
-import { BedrockRuntimeClient, InvokeModelCommand, InvokeModelCommandOutput } from "@aws-sdk/client-bedrock-runtime";
-
+import { BedrockRuntimeClient, ConverseCommand, ConverseCommandOutput } from "@aws-sdk/client-bedrock-runtime";
 
 
 class Bedrock {
 
   private readonly client: BedrockRuntimeClient;
 
-  private model: string = process.env.BEDROCK_MODEL!;
+  private model: string = process.env.BEDROCK_MODEL
+    ? `us.${process.env.BEDROCK_MODEL}`
+    : "us.amazon.nova-lite-v1:0";
 
   constructor() {
     this.client = new BedrockRuntimeClient({
@@ -24,7 +25,7 @@ class Bedrock {
     const payload = {
       messages: [
         {
-          role: "user",
+          role: "user" as const,
           content: [{ text: prompt }],
         },
       ],
@@ -36,18 +37,14 @@ class Bedrock {
       },
     };
 
-    const command = new InvokeModelCommand({
+    const command = new ConverseCommand({
       modelId: this.model,
-      contentType: "application/json",
-      accept: "application/json",
-      body: JSON.stringify(payload),
+      ...payload,
     });
 
-    const response: InvokeModelCommandOutput = await this.client.send(command);
+    const response: ConverseCommandOutput = await this.client.send(command);
 
-    const decoded = JSON.parse(new TextDecoder().decode(response.body));
-
-    return decoded?.output?.message?.content?.[0]?.text as string;
+    return response?.output?.message?.content?.[0]?.text as string;
 
   }
 
