@@ -5,9 +5,8 @@ class Bedrock {
 
   private readonly client: BedrockRuntimeClient;
 
-  private model: string = process.env.BEDROCK_MODEL
-    ? `us.${process.env.BEDROCK_MODEL}`
-    : "us.amazon.nova-lite-v1:0";
+
+  private model: string = process.env.BEDROCK_MODEL!;
 
   constructor() {
     this.client = new BedrockRuntimeClient({
